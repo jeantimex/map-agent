@@ -70,6 +70,7 @@ async function initMap() {
       center: { lat: 37.7749, lng: -122.4194 }, // Default to San Francisco
       zoom: 12,
       renderingType: "VECTOR",
+      fullscreenControl: false,
     });
 
     // Create the custom agent control
