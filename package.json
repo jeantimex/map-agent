@@ -12,6 +12,7 @@
     "vite": "^7.2.4"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@googlemaps/js-api-loader": "^2.0.2"
   }
 }

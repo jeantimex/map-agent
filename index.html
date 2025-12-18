@@ -7,7 +7,20 @@
     <title>Google Maps Agent</title>
   </head>
   <body>
-    <div id="map"></div>
+    <main class="app-container">
+      <div id="map-container">
+        <div id="map"></div>
+      </div>
+      <div class="chat-container">
+        <div id="chat-messages" class="messages">
+          <div class="message system">Hello! I'm your Map Agent. Where would you like to explore today? 🗺️</div>
+        </div>
+        <div class="input-area">
+          <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off" />
+          <button id="send-btn">Send</button>
+        </div>
+      </div>
+    </main>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
