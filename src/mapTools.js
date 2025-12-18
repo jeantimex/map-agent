@@ -1,13 +1,25 @@
 export const mapTools = [
   {
     name: "panToLocation",
-    description: "Moves the map center to a specific city or place.",
+    description: "Moves the map center to a specific city or place by name using smooth animation.",
     parameters: {
       type: "OBJECT",
       properties: {
         locationName: { type: "STRING", description: "The name of the city or place" },
       },
       required: ["locationName"],
+    },
+  },
+  {
+    name: "panToCoordinates",
+    description: "Moves the map center to specific latitude and longitude coordinates using smooth animation.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        lat: { type: "NUMBER", description: "The latitude" },
+        lng: { type: "NUMBER", description: "The longitude" },
+      },
+      required: ["lat", "lng"],
     },
   },
   {
@@ -32,8 +44,9 @@ export async function executeMapCommand(functionName, args, map, geocoder) {
     try {
       const { results } = await geocoder.geocode({ address: args.locationName });
       if (results && results[0]) {
+        // panTo(latLng) provides smooth animation
         map.panTo(results[0].geometry.location);
-        return `Moved map to ${args.locationName}`;
+        return `Successfully executed map.panTo() to move map to ${args.locationName}`;
       } else {
         return `Could not find location: ${args.locationName}`;
       }
@@ -43,10 +56,17 @@ export async function executeMapCommand(functionName, args, map, geocoder) {
     }
   } 
   
+  else if (functionName === "panToCoordinates") {
+    if (!map) return "Map not ready.";
+    // panTo(latLng) using LatLngLiteral
+    map.panTo({ lat: args.lat, lng: args.lng });
+    return `Successfully executed map.panTo() to move map to coordinates: ${args.lat}, ${args.lng}`;
+  }
+  
   else if (functionName === "zoomMap") {
     if (!map) return "Map not ready.";
     map.setZoom(args.level);
-    return `Zoomed map to level ${args.level}`;
+    return `Successfully executed map.setZoom(${args.level})`;
   }
   
   return "Unknown tool command.";
