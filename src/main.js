@@ -36,7 +36,7 @@ const model = genAI.getGenerativeModel({
 function createAgentControl(map) {
   const agentControl = document.createElement('button');
   agentControl.classList.add('agent-control');
-  agentControl.title = "Reset Heading & Tilt";
+  agentControl.title = "Map Agent";
 
   const agentIcon = document.createElement('img');
   agentIcon.src = geminiIcon;
