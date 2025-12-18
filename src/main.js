@@ -1,24 +1,23 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
+import "./style.css";
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+setOptions({
+  key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+  v: "weekly",
+});
 
-setupCounter(document.querySelector('#counter'))
+async function initMap() {
+  try {
+    const { Map } = await importLibrary("maps");
+    
+    new Map(document.getElementById("map"), {
+      center: { lat: 0, lng: 0 },
+      zoom: 4,
+      renderingType: "VECTOR",
+    });
+  } catch (error) {
+    console.error("Error loading Google Maps API:", error);
+  }
+}
+
+initMap();
