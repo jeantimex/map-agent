@@ -76,6 +76,8 @@ async function initMap() {
       renderingType: "VECTOR",
       disableDefaultUI: true,
       streetViewControl: true,
+      tiltInteractionEnabled: true,
+      headingInteractionEnabled: true,
     });
 
     // Initialize Street View Panorama
