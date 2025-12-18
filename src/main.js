@@ -62,8 +62,7 @@ async function initMap() {
     map = new Map(mapElement, {
       center: { lat: 37.7749, lng: -122.4194 }, // Default to San Francisco
       zoom: 12,
-      disableDefaultUI: true,
-      zoomControl: true,
+      renderingType: "VECTOR",
     });
     
     // Start chat session only after map is ready
