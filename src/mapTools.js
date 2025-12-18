@@ -23,6 +23,21 @@ export const mapTools = [
     },
   },
   {
+    name: "panToBounds",
+    description: "Pans the map to contain the given bounds (south, west, north, east). Zoom is NOT changed.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        south: { type: "NUMBER", description: "Southern latitude" },
+        west: { type: "NUMBER", description: "Western longitude" },
+        north: { type: "NUMBER", description: "Northern latitude" },
+        east: { type: "NUMBER", description: "Eastern longitude" },
+        padding: { type: "NUMBER", description: "Padding in pixels (optional, default 0)" }
+      },
+      required: ["south", "west", "north", "east"],
+    },
+  },
+  {
     name: "zoomMap",
     description: "Zooms the map in or out.",
     parameters: {
@@ -61,6 +76,23 @@ export async function executeMapCommand(functionName, args, map, geocoder) {
     // panTo(latLng) using LatLngLiteral
     map.panTo({ lat: args.lat, lng: args.lng });
     return `Successfully executed map.panTo() to move map to coordinates: ${args.lat}, ${args.lng}`;
+  }
+
+  else if (functionName === "panToBounds") {
+    if (!map) return "Map not ready.";
+    
+    const bounds = {
+      south: args.south,
+      west: args.west,
+      north: args.north,
+      east: args.east
+    };
+    
+    const padding = args.padding || 0;
+    
+    // panToBounds(latLngBounds, padding)
+    map.panToBounds(bounds, padding);
+    return `Successfully executed map.panToBounds() with bounds: [${bounds.south}, ${bounds.west}, ${bounds.north}, ${bounds.east}] and padding: ${padding}`;
   }
   
   else if (functionName === "zoomMap") {
