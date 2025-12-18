@@ -1,2 +1,3 @@
-# map-navigator-agent
-An AI agent that helps navigate Google Maps
+# Map Agent
+
+An AI agent that helps navigate the Google Maps
