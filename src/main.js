@@ -42,8 +42,15 @@ function createAgentControl(map) {
   agentIcon.classList.add('agent-icon');
   agentControl.appendChild(agentIcon);
 
+  // When the agent is clicked, toggle chat and reset map's heading and tilt
   agentControl.addEventListener('click', () => {
+    const chatContainer = document.querySelector('.chat-container');
+    chatContainer.classList.toggle('open');
     
+    // Focus input if opening
+    if (chatContainer.classList.contains('open')) {
+      setTimeout(() => document.getElementById('chat-input').focus(), 300);
+    }
   });
 
   return agentControl;
@@ -68,6 +75,16 @@ async function initMap() {
     // Create the custom agent control
     const agentControl = createAgentControl(map);
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(agentControl);
+
+    // Close chat on map click
+    map.addListener('click', () => {
+      document.querySelector('.chat-container').classList.remove('open');
+    });
+    
+    // Close chat on button click
+    document.getElementById('close-chat').addEventListener('click', () => {
+      document.querySelector('.chat-container').classList.remove('open');
+    });
     
     // Start chat session only after map is ready
     chatSession = model.startChat();

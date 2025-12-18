@@ -20,16 +20,18 @@ html, body {
 }
 
 .app-container {
-  display: flex;
-  flex-direction: column;
+  display: block; /* No longer flex column */
   height: 100vh;
   width: 100vw;
+  position: relative;
 }
 
 #map-container {
-  flex: 1; /* Map takes all available remaining space */
+  height: 100%;
   width: 100%;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 #map {
@@ -38,12 +40,54 @@ html, body {
 }
 
 .chat-container {
-  height: 300px; /* Fixed height for the chat area */
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  bottom: 80px; /* Leave space for the agent button */
+  width: 350px;
   background-color: var(--chat-bg);
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--border-color);
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 12px;
+  z-index: 1000;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform: translateX(120%); /* Initially hidden */
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.chat-header {
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+#close-chat {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  line-height: 1;
+  padding: 0 5px;
+}
+
+#close-chat:hover {
+  color: #000;
+}
+
+.chat-container.open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: all;
 }
 
 .messages {
@@ -56,11 +100,12 @@ html, body {
 }
 
 .message {
-  max-width: 80%;
+  max-width: 85%;
   padding: 10px 15px;
   border-radius: 15px;
   font-size: 14px;
   line-height: 1.4;
+  word-wrap: break-word;
 }
 
 .message.system {
@@ -87,15 +132,17 @@ html, body {
   border-radius: 20px;
   border: 1px solid var(--border-color);
   outline: none;
+  font-size: 14px;
 }
 
 #send-btn {
-  padding: 0 20px;
+  padding: 0 15px;
   border-radius: 20px;
   border: none;
   background-color: var(--primary-color);
   color: white;
   cursor: pointer;
+  font-weight: 500;
 }
 
 /*
@@ -104,23 +151,28 @@ html, body {
 .agent-control {
   background-color: #fff;
   border: none;
-  border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  border-radius: 50%; /* Make it rounder */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   cursor: pointer;
   margin: 10px;
   padding: 0;
-  width: 40px;
+  width: 40px; /* FAB size */
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 200px; /* For 3D tilt effect */
+  perspective: 200px;
   overflow: visible;
+  transition: transform 0.2s;
+}
+
+.agent-control:hover {
+  transform: scale(1.05);
 }
 
 .agent-icon {
   width: 24px;
   height: 24px;
   display: block;
-  transition: transform 0.1s linear; /* Smooth update for tilt/heading */
+  transition: transform 0.1s linear;
 }
