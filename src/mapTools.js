@@ -98,6 +98,22 @@ export const mapTools = [
     },
   },
   {
+    name: "showStreetView",
+    description: "Shows the Street View panorama for the current map location.",
+    parameters: {
+      type: "OBJECT",
+      properties: {}, // No params needed, uses map center
+    },
+  },
+  {
+    name: "hideStreetView",
+    description: "Hides the Street View panorama and returns to the map view.",
+    parameters: {
+      type: "OBJECT",
+      properties: {},
+    },
+  },
+  {
     name: "zoomMap",
     description: "Zooms the map in or out.",
     parameters: {
@@ -110,7 +126,7 @@ export const mapTools = [
   },
 ];
 
-export async function executeMapCommand(functionName, args, map, geocoder) {
+export async function executeMapCommand(functionName, args, map, geocoder, panorama) {
   console.log(`Executing tool: ${functionName}`, args);
 
   if (functionName === "panToLocation") {
@@ -198,6 +214,47 @@ export async function executeMapCommand(functionName, args, map, geocoder) {
     if (!map) return "Error: Map not initialized.";
     map.setZoom(args.level);
     return `Successfully executed map.setZoom(${args.level})`;
+  }
+
+  else if (functionName === "showStreetView") {
+    if (!panorama) return "Error: Street View not initialized.";
+    
+    // Toggle split view class on the container
+    document.getElementById("map-container").classList.add("split-view");
+    
+    // Set position to current map center
+    panorama.setPosition(map.getCenter());
+    panorama.setPov({
+        heading: map.getHeading() || 0,
+        pitch: 0,
+    });
+    panorama.setVisible(true);
+
+    // Link map to street view
+    map.setStreetView(panorama);
+    
+    // Trigger map resize event so it fills the new 50% width correctly
+    setTimeout(() => {
+        google.maps.event.trigger(map, "resize");
+    }, 550); // Wait for transition
+    
+    return "Successfully showed Street View in split mode.";
+  }
+
+  else if (functionName === "hideStreetView") {
+    if (!panorama) return "Error: Street View not initialized.";
+    
+    // Remove split view class
+    document.getElementById("map-container").classList.remove("split-view");
+    
+    panorama.setVisible(false);
+    
+    // Trigger map resize event to restore full width
+    setTimeout(() => {
+        google.maps.event.trigger(map, "resize");
+    }, 550);
+
+    return "Successfully hidden Street View.";
   }
   
   return `Error: Unknown tool command '${functionName}'.`;

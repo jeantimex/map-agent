@@ -20,7 +20,7 @@ html, body {
 }
 
 .app-container {
-  display: block; /* No longer flex column */
+  display: block; 
   height: 100vh;
   width: 100vw;
   position: relative;
@@ -32,18 +32,45 @@ html, body {
   position: absolute;
   top: 0;
   left: 0;
+  display: flex; /* Enable flex layout */
+  flex-direction: row; /* Side by side */
+}
+
+#pano {
+  height: 100%;
+  width: 0; /* Initially hidden width */
+  background-color: #222;
+  transition: width 0.5s ease-in-out;
+  position: relative; /* Normal flow in flex */
+  z-index: 1;
+  overflow: hidden; /* Hide content when width is 0 */
 }
 
 #map {
   height: 100%;
-  width: 100%;
+  flex: 1; /* Take remaining space (initially 100%) */
+  position: relative; /* Normal flow in flex */
+  z-index: 1;
+  transition: width 0.5s ease-in-out;
 }
+
+/* When Street View is active */
+#map-container.split-view #pano {
+  width: 50%; /* Take half width */
+  border-right: 1px solid var(--border-color);
+}
+
+#map-container.split-view #map {
+  width: 50%; /* Force half width if needed, though flex:1 handles it if pano is fixed width. 
+                 But for animation, explicit widths or flex-basis is better. */
+}
+
 
 .chat-container {
   position: absolute;
   top: 20px;
   right: 20px;
-  bottom: 80px; /* Leave space for the agent button */
+  bottom: 80px; 
   width: 350px;
   background-color: var(--chat-bg);
   display: flex;
@@ -53,10 +80,16 @@ html, body {
   border-radius: 12px;
   z-index: 1000;
   transition: transform 0.3s ease, opacity 0.3s ease;
-  transform: translateX(120%); /* Initially hidden */
+  transform: translateX(120%); 
   opacity: 0;
   pointer-events: none;
   overflow: hidden;
+}
+
+.chat-container.open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: all;
 }
 
 .chat-header {
@@ -82,12 +115,6 @@ html, body {
 
 #close-chat:hover {
   color: #000;
-}
-
-.chat-container.open {
-  transform: translateX(0);
-  opacity: 1;
-  pointer-events: all;
 }
 
 .messages {

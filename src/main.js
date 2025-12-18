@@ -2,6 +2,7 @@ import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { mapTools, executeMapCommand } from "./mapTools.js";
 import "./style.css";
+import geminiIcon from './Google-gemini-icon.svg';
 
 // --- Configuration ---
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -15,6 +16,7 @@ setOptions({
 // --- State ---
 let map;
 let geocoder;
+let panorama;
 let chatSession;
 
 // --- Gemini Setup ---
@@ -25,7 +27,6 @@ const model = genAI.getGenerativeModel({
   tools: [{ functionDeclarations: mapTools }],
 });
 
-import geminiIcon from './Google-gemini-icon.svg';
 
 /**
  * Create an agent control for:
@@ -64,13 +65,24 @@ async function initMap() {
   try {
     const { Map } = await importLibrary("maps");
     const { Geocoder } = await importLibrary("geocoding");
+    const { StreetViewPanorama } = await importLibrary("streetView");
 
     geocoder = new Geocoder();
+    const sfCoords = { lat: 37.7749, lng: -122.4194 };
+    
     map = new Map(mapElement, {
-      center: { lat: 37.7749, lng: -122.4194 }, // Default to San Francisco
+      center: sfCoords, // Default to San Francisco
       zoom: 12,
       renderingType: "VECTOR",
-      fullscreenControl: false,
+      disableDefaultUI: true,
+      streetViewControl: true,
+    });
+
+    // Initialize Street View Panorama
+    panorama = new StreetViewPanorama(document.getElementById("pano"), {
+        position: sfCoords,
+        visible: false, // Start hidden
+        pov: { heading: 0, pitch: 0 }
     });
 
     // Create the custom agent control
@@ -131,7 +143,7 @@ async function handleSendMessage() {
     if (functionCalls && functionCalls.length > 0) {
       for (const call of functionCalls) {
         // executeMapCommand now imported from mapTools.js
-        const toolResult = await executeMapCommand(call.name, call.args, map, geocoder);
+        const toolResult = await executeMapCommand(call.name, call.args, map, geocoder, panorama);
         
         // IMPORTANT: We must send the tool execution result back to Gemini
         const resultParts = [
