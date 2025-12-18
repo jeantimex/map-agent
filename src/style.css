@@ -97,3 +97,30 @@ html, body {
   color: white;
   cursor: pointer;
 }
+
+/*
+ * CSS for the Agent Control
+ */
+.agent-control {
+  background-color: #fff;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  cursor: pointer;
+  margin: 10px;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 200px; /* For 3D tilt effect */
+  overflow: visible;
+}
+
+.agent-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  transition: transform 0.1s linear; /* Smooth update for tilt/heading */
+}

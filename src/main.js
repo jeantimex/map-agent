@@ -25,6 +25,30 @@ const model = genAI.getGenerativeModel({
   tools: [{ functionDeclarations: mapTools }],
 });
 
+import geminiIcon from './Google-gemini-icon.svg';
+
+/**
+ * Create an agent control for:
+ *   1. displaying the heading and tilting of the map in realtime
+ *   2. resetting the heading and tilting of the map on click
+ */
+function createAgentControl(map) {
+  const agentControl = document.createElement('button');
+  agentControl.classList.add('agent-control');
+  agentControl.title = "Reset Heading & Tilt";
+
+  const agentIcon = document.createElement('img');
+  agentIcon.src = geminiIcon;
+  agentIcon.classList.add('agent-icon');
+  agentControl.appendChild(agentIcon);
+
+  agentControl.addEventListener('click', () => {
+    
+  });
+
+  return agentControl;
+}
+
 // --- Map Initialization ---
 async function initMap() {
   const mapElement = document.getElementById("map");
@@ -40,6 +64,10 @@ async function initMap() {
       zoom: 12,
       renderingType: "VECTOR",
     });
+
+    // Create the custom agent control
+    const agentControl = createAgentControl(map);
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(agentControl);
     
     // Start chat session only after map is ready
     chatSession = model.startChat();
