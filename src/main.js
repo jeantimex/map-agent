@@ -1,5 +1,6 @@
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { mapTools, executeMapCommand } from "./mapTools.js";
 import "./style.css";
 
 // --- Configuration ---
@@ -18,31 +19,6 @@ let chatSession;
 
 // --- Gemini Setup ---
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-
-const mapTools = [
-  {
-    name: "panToLocation",
-    description: "Moves the map center to a specific city or place.",
-    parameters: {
-      type: "OBJECT",
-      properties: {
-        locationName: { type: "STRING", description: "The name of the city or place" },
-      },
-      required: ["locationName"],
-    },
-  },
-  {
-    name: "zoomMap",
-    description: "Zooms the map in or out.",
-    parameters: {
-      type: "OBJECT",
-      properties: {
-        level: { type: "NUMBER", description: "Zoom level (1-20). 1 is world view, 20 is building view." },
-      },
-      required: ["level"],
-    },
-  },
-];
 
 const model = genAI.getGenerativeModel({
   model: "gemini-3-flash-preview",
@@ -77,36 +53,6 @@ async function initMap() {
 
 initMap();
 
-// --- Map Control Logic ---
-async function executeMapCommand(functionName, args) {
-  console.log(`Executing tool: ${functionName}`, args);
-
-  if (functionName === "panToLocation") {
-    if (!geocoder) return "Geocoder not ready.";
-    
-    try {
-      const { results } = await geocoder.geocode({ address: args.locationName });
-      if (results && results[0]) {
-        map.panTo(results[0].geometry.location);
-        return `Moved map to ${args.locationName}`;
-      } else {
-        return `Could not find location: ${args.locationName}`;
-      }
-    } catch (e) {
-      console.error("Geocoding failed", e);
-      return "Error finding location.";
-    }
-  } 
-  
-  else if (functionName === "zoomMap") {
-    if (!map) return "Map not ready.";
-    map.setZoom(args.level);
-    return `Zoomed map to level ${args.level}`;
-  }
-  
-  return "Unknown tool command.";
-}
-
 // --- Chat Interface ---
 const chatInput = document.getElementById("chat-input");
 const sendBtn = document.getElementById("send-btn");
@@ -137,10 +83,10 @@ async function handleSendMessage() {
     
     if (functionCalls && functionCalls.length > 0) {
       for (const call of functionCalls) {
-        const toolResult = await executeMapCommand(call.name, call.args);
+        // executeMapCommand now imported from mapTools.js
+        const toolResult = await executeMapCommand(call.name, call.args, map, geocoder);
         
         // IMPORTANT: We must send the tool execution result back to Gemini
-        // so it can generate a final natural language response.
         const resultParts = [
           {
             functionResponse: {
