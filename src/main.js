@@ -104,6 +104,7 @@ const sendBtn = document.getElementById("send-btn");
 const messagesContainer = document.getElementById("chat-messages");
 
 function addMessage(text, isUser = false) {
+  if (!text || !text.trim()) return; // Don't add empty messages
   const messageDiv = document.createElement("div");
   messageDiv.className = `message ${isUser ? "user" : "system"}`;
   messageDiv.textContent = text;
