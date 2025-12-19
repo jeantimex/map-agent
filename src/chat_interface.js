@@ -6,6 +6,12 @@ export function initChatInterface(onSendMessage) {
   let recognition;
   let isListening = false;
 
+  // Auto-resize logic
+  const adjustHeight = () => {
+    chatInput.style.height = 'auto'; // Reset height
+    chatInput.style.height = chatInput.scrollHeight + 'px'; // Set to scroll height
+  };
+
   // Initialize Speech Recognition
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -27,6 +33,7 @@ export function initChatInterface(onSendMessage) {
         transcript += event.results[i][0].transcript;
       }
       chatInput.value = transcript;
+      adjustHeight(); // Resize on voice input
       updateButtonState(); 
     };
 
@@ -82,6 +89,7 @@ export function initChatInterface(onSendMessage) {
 
     addMessage(message, true);
     chatInput.value = "";
+    chatInput.style.height = 'auto'; // Reset height after sending
     chatInput.disabled = true;
     updateButtonState();
 
@@ -95,9 +103,15 @@ export function initChatInterface(onSendMessage) {
 
   // Event Listeners
   actionBtn.addEventListener("click", handleAction);
-  chatInput.addEventListener("input", updateButtonState);
-  chatInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
+  
+  chatInput.addEventListener("input", () => {
+    adjustHeight();
+    updateButtonState();
+  });
+
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent new line
       triggerSend();
     }
   });

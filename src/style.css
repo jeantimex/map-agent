@@ -151,7 +151,7 @@ html, body {
   display: flex;
   gap: 10px;
   border-top: 1px solid var(--border-color);
-  align-items: center;
+  align-items: flex-end; /* Align button to bottom */
 }
 
 #chat-input {
@@ -162,6 +162,12 @@ html, body {
   outline: none;
   font-size: 14px;
   background-color: #f1f3f4;
+  resize: none; /* Prevent manual resize */
+  overflow: hidden; /* Hide scrollbar for auto-height */
+  min-height: 44px; /* Matches previous input height */
+  max-height: 150px; /* Limit max height */
+  line-height: 1.4;
+  font-family: inherit; /* Ensure font matches */
 }
 
 #chat-input:focus {
