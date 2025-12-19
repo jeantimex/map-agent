@@ -6,7 +6,8 @@ const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 setOptions({
   key: GOOGLE_MAPS_API_KEY,
-  v: "quarterly",
+  v: "weekly",
+  libraries: ["maps", "geocoding", "streetView"]
 });
 
 export async function initMapService() {
