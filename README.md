@@ -2,9 +2,7 @@
 
 An interactive, AI-powered map agent built with **Google Maps JavaScript API** and **Gemini 3.0 Flash Preview**. This application allows users to control the map using natural language commands, explore places, and visualize Street View in a modern split-screen interface.
 
-https://github.com/user-attachments/assets/c4a01cb0-889c-45f4-acfc-1c72899d504a
-
-Live demo: https://jeantimex.github.io/map-agent/
+[https://github.com/user-attachments/assets/c4a01cb0-889c-45f4-acfc-1c72899d504a](https://github.com/user-attachments/assets/0c056a54-54cc-48fb-bd45-ec9eec6d2da9)
 
 ## Features
 
