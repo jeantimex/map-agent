@@ -1,14 +1,13 @@
 # Google Maps AI Agent 🗺️ 🤖
 
-An interactive, AI-powered map agent built with **Google Maps JavaScript API** and **Gemini 3.0 Flash Preview**. This application allows users to control the map using natural language commands, explore places, and visualize Street View in a modern split-screen interface.
-
-https://github.com/user-attachments/assets/643182ca-0db7-4723-bf15-b5d49049cacf
+An interactive, AI-powered map agent built with **Google Maps JavaScript API** and **Gemini 2.0 Flash**. This application allows users to control the map using natural language commands, explore places, and visualize Street View in a modern split-screen interface.
 
 ## Features
 
 -   **Natural Language Navigation**: Ask the agent to "Go to Tokyo", "Zoom in", "Show me the Eiffel Tower", or "Pan to coordinates".
 -   **AI-Driven Control**: Uses the Gemini API to understand intent and execute Google Maps commands (pan, zoom, tilt, heading).
 -   **Street View Integration**: Simply ask to "Show Street View" to open a split-screen panorama view alongside the map.
+-   **Interactive Street View**: Navigate within Street View naturally by asking to "walk north", "look left", or "turn around".
 -   **3D Map Capabilities**: Supports vector maps with tilt and heading control for immersive 3D exploration.
 -   **Interactive Agent UI**: A floating agent button with a 3D-styled icon that reacts to map orientation (heading/tilt) and toggles the chat interface.
 -   **Map Types**: Switch between Roadmap, Satellite, Hybrid, and Terrain views on command.
@@ -56,26 +55,29 @@ You need API keys for the following Google Cloud services:
 
 Open the chat by clicking the Gemini agent icon in the bottom-right corner. Try these commands:
 
--   **Navigation**: "Take me to San Francisco."
--   **Exploration**: "Show me Central Park in New York."
--   **Street View**: "Show Street View here." / "Hide Street View."
--   **Map Control**: "Zoom in a little.", "Tilt the map 45 degrees.", "Rotate the map 90 degrees."
--   **Coordinates**: "Go to lat 48.8566, lng 2.3522."
--   **Views**: "Switch to satellite view."
+### 🌍 Navigation & Exploration
+-   "Take me to the Golden Gate Bridge."
+-   "Fly to Tokyo, Japan."
+-   "Show me Central Park in New York."
+-   "Go to coordinates 48.8566, 2.3522."
 
-## Project Structure
+### 🗺️ Map Control
+-   "Zoom in closer."
+-   "Zoom out to world view."
+-   "Pan slightly to the right."
+-   "Switch to satellite view."
+-   "Show me the terrain map."
 
-```
-map-agent/
-├── index.html          # Main HTML entry point
-├── package.json        # Dependencies and scripts
-├── .env                # API keys (not committed)
-└── src/
-    ├── main.js         # Application entry point & initialization
-    ├── mapTools.js     # Tool definitions and execution logic
-    ├── style.css       # Global styles and layout
-    └── mapTools.js     # Gemini function definitions
-```
+### 🏢 3D & Perspective
+-   "Tilt the map 45 degrees."
+-   "Rotate the map 90 degrees."
+-   "Show me a 3D view of the city."
+
+### 🚶 Street View & Panoramas
+-   **Activation**: "Show Street View here." (Opens split-screen mode)
+-   **Look Around**: "Look to the left", "Look up at the sky", "Pan right".
+-   **Movement**: "Walk north", "Go forward", "Step southwest".
+-   **Deactivation**: "Hide Street View", "Go back to the map".
 
 ## License
 
