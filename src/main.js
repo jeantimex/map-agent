@@ -115,8 +115,88 @@ initMap();
 
 // --- Chat Interface ---
 const chatInput = document.getElementById("chat-input");
-const sendBtn = document.getElementById("send-btn");
+const actionBtn = document.getElementById("action-btn"); // Renamed from sendBtn
+const actionIcon = actionBtn.querySelector("span");
 const messagesContainer = document.getElementById("chat-messages");
+
+let recognition;
+let isListening = false;
+
+// Initialize Speech Recognition
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = true; // Keep listening until stopped
+  recognition.interimResults = true; // Show live results
+  recognition.lang = 'en-US';
+
+  recognition.onstart = () => {
+    isListening = true;
+    actionBtn.classList.add("listening");
+    actionIcon.textContent = "stop"; // Change to stop icon
+    chatInput.placeholder = "Listening...";
+  };
+
+  recognition.onresult = (event) => {
+    let transcript = '';
+    for (let i = 0; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    chatInput.value = transcript;
+    updateButtonState(); // Switch to send button if text exists
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    actionBtn.classList.remove("listening");
+    chatInput.placeholder = "Type a message...";
+    updateButtonState(); // Reset icon based on content
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Speech recognition error", event.error);
+    isListening = false;
+    actionBtn.classList.remove("listening");
+    updateButtonState();
+  };
+} else {
+  console.warn("Web Speech API not supported in this browser.");
+  // Fallback: Always show send button or hide mic
+  actionIcon.textContent = "send";
+}
+
+function updateButtonState() {
+  if (isListening) return; // Don't change if listening
+
+  if (chatInput.value.trim().length > 0) {
+    // Show Send button
+    actionBtn.classList.add("send");
+    actionIcon.textContent = "send";
+  } else {
+    // Show Mic button
+    actionBtn.classList.remove("send");
+    actionIcon.textContent = "mic";
+  }
+}
+
+function handleAction() {
+  // 1. If listening, stop listening
+  if (isListening) {
+    recognition.stop();
+    return;
+  }
+
+  // 2. If text exists, send message
+  if (chatInput.value.trim().length > 0) {
+    handleSendMessage();
+    return;
+  }
+
+  // 3. If empty and mic supported, start listening
+  if (recognition) {
+    recognition.start();
+  }
+}
 
 function addMessage(text, isUser = false) {
   if (!text || !text.trim()) return; // Don't add empty messages
@@ -134,6 +214,7 @@ async function handleSendMessage() {
   addMessage(message, true);
   chatInput.value = "";
   chatInput.disabled = true; // Disable input while processing
+  updateButtonState(); // Reset to mic
 
   try {
     const result = await chatSession.sendMessage(message);
@@ -171,11 +252,13 @@ async function handleSendMessage() {
   } finally {
     chatInput.disabled = false;
     chatInput.focus();
+    updateButtonState();
   }
 }
 
-sendBtn.addEventListener("click", handleSendMessage);
-
+// Event Listeners
+actionBtn.addEventListener("click", handleAction);
+chatInput.addEventListener("input", updateButtonState);
 chatInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     handleSendMessage();

@@ -5,6 +5,7 @@
   --border-color: #dadce0;
   --text-primary: #202124;
   --text-secondary: #5f6368;
+  --mic-color: #ea4335; /* Google Red for active mic */
 }
 
 * {
@@ -61,8 +62,7 @@ html, body {
 }
 
 #map-container.split-view #map {
-  width: 50%; /* Force half width if needed, though flex:1 handles it if pano is fixed width. 
-                 But for animation, explicit widths or flex-basis is better. */
+  width: 50%; 
 }
 
 
@@ -151,25 +151,72 @@ html, body {
   display: flex;
   gap: 10px;
   border-top: 1px solid var(--border-color);
+  align-items: center;
 }
 
 #chat-input {
   flex: 1;
-  padding: 10px 15px;
-  border-radius: 20px;
+  padding: 12px 15px;
+  border-radius: 24px;
   border: 1px solid var(--border-color);
   outline: none;
   font-size: 14px;
+  background-color: #f1f3f4;
 }
 
-#send-btn {
-  padding: 0 15px;
-  border-radius: 20px;
+#chat-input:focus {
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.action-btn {
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   border: none;
+  background-color: #f1f3f4; /* Default inactive state */
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+/* Send State */
+.action-btn.send {
   background-color: var(--primary-color);
   color: white;
-  cursor: pointer;
-  font-weight: 500;
+}
+
+/* Mic State (Listening) */
+.action-btn.listening {
+  background-color: var(--mic-color);
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(234, 67, 53, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0); }
+}
+
+/* Google Material Icons font support */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
 }
 
 /*
@@ -178,13 +225,13 @@ html, body {
 .agent-control {
   background-color: #fff;
   border: none;
-  border-radius: 50%; /* Make it rounder */
+  border-radius: 50%;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   cursor: pointer;
   margin: 10px;
   padding: 0;
-  width: 40px; /* FAB size */
-  height: 40px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,8 +245,8 @@ html, body {
 }
 
 .agent-icon {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   display: block;
   transition: transform 0.1s linear;
 }
