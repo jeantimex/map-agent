@@ -114,6 +114,17 @@ export const mapTools = [
     },
   },
   {
+    name: "setStreetViewPov",
+    description: "Adjusts the Street View camera's point of view (heading and pitch).",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        heading: { type: "NUMBER", description: "The camera heading in degrees relative to true north (0-360)." },
+        pitch: { type: "NUMBER", description: "The camera pitch in degrees (-90 to 90). 0 is level, 90 is straight up, -90 is straight down." },
+      },
+    },
+  },
+  {
     name: "zoomMap",
     description: "Zooms the map in or out.",
     parameters: {
@@ -126,6 +137,15 @@ export const mapTools = [
   },
 ];
 
+/**
+ * Helper to update panorama position if it's currently visible/linked.
+ */
+function updatePanoramaIfVisible(map, panorama) {
+  if (panorama && panorama.getVisible()) {
+    panorama.setPosition(map.getCenter());
+  }
+}
+
 export async function executeMapCommand(functionName, args, map, geocoder, panorama) {
   console.log(`Executing tool: ${functionName}`, args);
 
@@ -135,8 +155,9 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
     try {
       const { results } = await geocoder.geocode({ address: args.locationName });
       if (results && results[0]) {
-        // panTo(latLng) provides smooth animation
-        map.panTo(results[0].geometry.location);
+        const location = results[0].geometry.location;
+        map.panTo(location);
+        updatePanoramaIfVisible(map, panorama);
         return `Successfully executed map.panTo() to move map to ${args.locationName}`;
       } else {
         return `Error: Could not find location '${args.locationName}'. Please check the spelling.`;
@@ -149,15 +170,17 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
   
   else if (functionName === "panToCoordinates") {
     if (!map) return "Error: Map not initialized.";
-    // panTo(latLng) using LatLngLiteral
-    map.panTo({ lat: args.lat, lng: args.lng });
+    const latLng = { lat: args.lat, lng: args.lng };
+    map.panTo(latLng);
+    updatePanoramaIfVisible(map, panorama);
     return `Successfully executed map.panTo() to move map to coordinates: ${args.lat}, ${args.lng}`;
   }
 
   else if (functionName === "setCenter") {
     if (!map) return "Error: Map not initialized.";
-    // setCenter(latLng) using LatLngLiteral
-    map.setCenter({ lat: args.lat, lng: args.lng });
+    const latLng = { lat: args.lat, lng: args.lng };
+    map.setCenter(latLng);
+    updatePanoramaIfVisible(map, panorama);
     return `Successfully executed map.setCenter() with coordinates: ${args.lat}, ${args.lng}`;
   }
 
@@ -173,35 +196,34 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
     
     const padding = args.padding || 0;
     
-    // panToBounds(latLngBounds, padding)
     map.panToBounds(bounds, padding);
+    // Note: panToBounds updates center asynchronously/internally, 
+    // we call updatePanoramaIfVisible after the call.
+    updatePanoramaIfVisible(map, panorama);
     return `Successfully executed map.panToBounds() with bounds: [${bounds.south}, ${bounds.west}, ${bounds.north}, ${bounds.east}] and padding: ${padding}`;
   }
 
   else if (functionName === "panBy") {
     if (!map) return "Error: Map not initialized.";
-    // panBy(x, y)
     map.panBy(args.x, args.y);
+    updatePanoramaIfVisible(map, panorama);
     return `Successfully executed map.panBy(${args.x}, ${args.y})`;
   }
 
   else if (functionName === "setHeading") {
     if (!map) return "Error: Map not initialized.";
-    // setHeading(heading)
     map.setHeading(args.heading);
     return `Successfully executed map.setHeading(${args.heading})`;
   }
 
   else if (functionName === "setTilt") {
     if (!map) return "Error: Map not initialized.";
-    // setTilt(tilt)
     map.setTilt(args.tilt);
     return `Successfully executed map.setTilt(${args.tilt})`;
   }
 
   else if (functionName === "setMapTypeId") {
     if (!map) return "Error: Map not initialized.";
-    // setMapTypeId(mapTypeId)
     const validTypes = ['roadmap', 'satellite', 'hybrid', 'terrain'];
     if (!validTypes.includes(args.mapTypeId)) {
         return `Error: Invalid map type '${args.mapTypeId}'. Valid types are: ${validTypes.join(', ')}.`;
@@ -219,24 +241,19 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
   else if (functionName === "showStreetView") {
     if (!panorama) return "Error: Street View not initialized.";
     
-    // Toggle split view class on the container
     document.getElementById("map-container").classList.add("split-view");
     
-    // Set position to current map center
     panorama.setPosition(map.getCenter());
     panorama.setPov({
         heading: map.getHeading() || 0,
         pitch: 0,
     });
     panorama.setVisible(true);
-
-    // Link map to street view
     map.setStreetView(panorama);
     
-    // Trigger map resize event so it fills the new 50% width correctly
     setTimeout(() => {
         google.maps.event.trigger(map, "resize");
-    }, 550); // Wait for transition
+    }, 550);
     
     return "Successfully showed Street View in split mode.";
   }
@@ -244,17 +261,31 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
   else if (functionName === "hideStreetView") {
     if (!panorama) return "Error: Street View not initialized.";
     
-    // Remove split view class
     document.getElementById("map-container").classList.remove("split-view");
-    
     panorama.setVisible(false);
     
-    // Trigger map resize event to restore full width
     setTimeout(() => {
         google.maps.event.trigger(map, "resize");
     }, 550);
 
     return "Successfully hidden Street View.";
+  }
+
+  else if (functionName === "setStreetViewPov") {
+    if (!panorama || !panorama.getVisible()) {
+        return "Error: Street View is not currently visible. Show it first.";
+    }
+    
+    // Get current POV to use as default if a param is missing
+    const currentPov = panorama.getPov();
+    
+    const newPov = {
+      heading: (args.heading !== undefined) ? args.heading : currentPov.heading,
+      pitch: (args.pitch !== undefined) ? args.pitch : currentPov.pitch,
+    };
+    
+    panorama.setPov(newPov);
+    return `Successfully executed panorama.setPov() with heading: ${newPov.heading}, pitch: ${newPov.pitch}`;
   }
   
   return `Error: Unknown tool command '${functionName}'.`;
