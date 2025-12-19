@@ -230,8 +230,8 @@ html, body {
   cursor: pointer;
   margin: 10px;
   padding: 0;
-  width: 56px;
-  height: 56px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -245,8 +245,8 @@ html, body {
 }
 
 .agent-icon {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   display: block;
   transition: transform 0.1s linear;
 }
