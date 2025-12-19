@@ -139,6 +139,20 @@ export const mapTools = [
     },
   },
   {
+    name: "lookAroundStreetView",
+    description: "Simulates a mouse drag to pan/look around in Street View smoothly. Use this for 'pan left', 'look around to the right', 'drag view up'.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        direction: { 
+          type: "STRING", 
+          description: "The direction to look: left, right, up, down." 
+        },
+      },
+      required: ["direction"],
+    },
+  },
+  {
     name: "zoomMap",
     description: "Zooms the map in or out.",
     parameters: {
@@ -158,6 +172,59 @@ function updatePanoramaIfVisible(map, panorama) {
   if (panorama && panorama.getVisible()) {
     panorama.setPosition(map.getCenter());
   }
+}
+
+/**
+ * Helper to simulate a smooth drag operation.
+ */
+function simulateDrag(element, startX, startY, endX, endY, duration = 500) {
+  const steps = 20;
+  const stepTime = duration / steps;
+  
+  // Mouse Down
+  const downEvent = new MouseEvent('mousedown', {
+    clientX: startX,
+    clientY: startY,
+    bubbles: true,
+    cancelable: true,
+    view: window
+  });
+  element.dispatchEvent(downEvent);
+
+  let currentStep = 0;
+
+  const animateDrag = () => {
+    currentStep++;
+    const progress = currentStep / steps;
+    const currentX = startX + (endX - startX) * progress;
+    const currentY = startY + (endY - startY) * progress;
+
+    // Mouse Move
+    const moveEvent = new MouseEvent('mousemove', {
+      clientX: currentX,
+      clientY: currentY,
+      bubbles: true,
+      cancelable: true,
+      view: window
+    });
+    element.dispatchEvent(moveEvent);
+
+    if (currentStep < steps) {
+      setTimeout(animateDrag, stepTime);
+    } else {
+      // Mouse Up
+      const upEvent = new MouseEvent('mouseup', {
+        clientX: endX,
+        clientY: endY,
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      element.dispatchEvent(upEvent);
+    }
+  };
+
+  animateDrag();
 }
 
 export async function executeMapCommand(functionName, args, map, geocoder, panorama) {
@@ -341,6 +408,48 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
     } else {
         return `Error: Unable to move ${direction}. The navigation arrow for '${direction}' was not found in the current view. Please inform the user that they cannot move in that direction here.`;
     }
+  }
+
+  else if (functionName === "lookAroundStreetView") {
+    if (!panorama || !panorama.getVisible()) {
+        return "Error: Street View is not currently visible. Show it first.";
+    }
+
+    const panoDiv = document.getElementById("pano");
+    // We need a specific element to dispatch events to. The canvas usually captures them.
+    // However, dispatching to the container usually bubbles down or is captured if we are lucky,
+    // but Google Maps events often listen on the widget container.
+    // Let's try finding the widget canvas or the container itself.
+    // A safe bet is the 'widget-scene-canvas' or just the #pano div if it captures bubbles.
+    // Let's inspect: usually there is a canvas inside.
+    
+    const rect = panoDiv.getBoundingClientRect();
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+    
+    let endX = startX;
+    let endY = startY;
+    const delta = 200; // Pixels to drag
+
+    // To look LEFT, we drag the scene RIGHT (positive X)
+    // To look RIGHT, we drag the scene LEFT (negative X)
+    // To look UP, we drag the scene DOWN (positive Y)
+    // To look DOWN, we drag the scene UP (negative Y)
+    
+    const direction = args.direction.toLowerCase();
+    
+    if (direction === "left") endX += delta;
+    else if (direction === "right") endX -= delta;
+    else if (direction === "up") endY += delta;
+    else if (direction === "down") endY -= delta;
+    else return "Error: Invalid direction. Use left, right, up, or down.";
+
+    // Target the canvas if possible, otherwise the div
+    const targetElement = panoDiv.querySelector('canvas') || panoDiv;
+
+    simulateDrag(targetElement, startX, startY, endX, endY);
+    
+    return `Successfully simulated mouse drag to look ${direction}.`;
   }
   
   return `Error: Unknown tool command '${functionName}'.`;
