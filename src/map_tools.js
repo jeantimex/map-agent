@@ -115,13 +115,27 @@ export const mapTools = [
   },
   {
     name: "setStreetViewPov",
-    description: "Adjusts the Street View camera's point of view (heading and pitch).",
+    description: "Rotates the camera to look in a specific direction or angle WITHOUT moving position. Use this for 'look up', 'turn right', 'look north'.",
     parameters: {
       type: "OBJECT",
       properties: {
         heading: { type: "NUMBER", description: "The camera heading in degrees relative to true north (0-360)." },
         pitch: { type: "NUMBER", description: "The camera pitch in degrees (-90 to 90). 0 is level, 90 is straight up, -90 is straight down." },
       },
+    },
+  },
+  {
+    name: "navigateStreetView",
+    description: "Moves the position of the Street View camera to the next panorama node in the specified direction. Use this for 'walk north', 'go forward', 'move northeast', 'step south'.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        direction: { 
+          type: "STRING", 
+          description: "The direction to move/walk: north, northeast, east, southeast, south, southwest, west, northwest." 
+        },
+      },
+      required: ["direction"],
     },
   },
   {
@@ -276,9 +290,7 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
         return "Error: Street View is not currently visible. Show it first.";
     }
     
-    // Get current POV to use as default if a param is missing
     const currentPov = panorama.getPov();
-    
     const newPov = {
       heading: (args.heading !== undefined) ? args.heading : currentPov.heading,
       pitch: (args.pitch !== undefined) ? args.pitch : currentPov.pitch,
@@ -286,6 +298,49 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
     
     panorama.setPov(newPov);
     return `Successfully executed panorama.setPov() with heading: ${newPov.heading}, pitch: ${newPov.pitch}`;
+  }
+
+  else if (functionName === "navigateStreetView") {
+    if (!panorama || !panorama.getVisible()) {
+        return "Error: Street View is not currently visible. Show it first.";
+    }
+
+    const direction = args.direction.toLowerCase();
+    const panoDiv = document.getElementById("pano");
+    
+    // Find the container for link arrows
+    // Look for divs ending with 'sv-links-control'
+    const linkControls = Array.from(panoDiv.querySelectorAll('div')).filter(el => 
+        el.className.includes('sv-links-control')
+    );
+    
+    if (linkControls.length === 0) {
+        return "Error: Could not find Street View navigation controls (sv-links-control).";
+    }
+
+    // Usually the last one found is the active overlay
+    const container = linkControls[linkControls.length - 1];
+    
+    // Find all paths
+    const paths = Array.from(container.querySelectorAll('path'));
+    
+    const targetPath = paths.find(path => {
+        const label = path.getAttribute('aria-label');
+        return label && label.toLowerCase().includes(direction);
+    });
+
+    if (targetPath) {
+        // Dispatch click to simulate navigation
+        const event = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+        });
+        targetPath.dispatchEvent(event);
+        return `Successfully simulated click to move ${direction}.`;
+    } else {
+        return `Error: Unable to move ${direction}. The navigation arrow for '${direction}' was not found in the current view. Please inform the user that they cannot move in that direction here.`;
+    }
   }
   
   return `Error: Unknown tool command '${functionName}'.`;
