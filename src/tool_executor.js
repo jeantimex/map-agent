@@ -326,11 +326,18 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
                         // Add click listener for InfoWindow
                         marker.addListener("click", () => {
                             const content = `
-                                <div style="padding: 5px; max-width: 200px;">
-                                    <h3 style="margin: 0 0 5px 0; font-size: 16px;">${place.name}</h3>
-                                    <p style="margin: 0 0 5px 0; font-size: 14px;">${place.rating ? `Rating: ${place.rating} ★` : ''}</p>
-                                    <p style="margin: 0; font-size: 12px; color: #555;">${place.formatted_address}</p>
-                                </div>
+                                <gmp-place-details-compact orientation="horizontal" truncation-preferred slot="control-block-start-inline-center">
+                                  <gmp-place-details-place-request place="${place.place_id}"></gmp-place-details-place-request>
+                                  <gmp-place-content-config>
+                                      <gmp-place-media lightbox-preferred></gmp-place-media>
+                                      <gmp-place-rating></gmp-place-rating>
+                                      <gmp-place-type></gmp-place-type>
+                                      <gmp-place-price></gmp-place-price>
+                                      <gmp-place-accessible-entrance-icon></gmp-place-accessible-entrance-icon>
+                                      <gmp-place-open-now-status></gmp-place-open-now-status>
+                                      <gmp-place-attribution light-scheme-color="gray" dark-scheme-color="white"></gmp-place-attribution>
+                                  </gmp-place-content-config>
+                                </gmp-place-details-compact>
                             `;
                             placesInfoWindow.setContent(content);
                             placesInfoWindow.open(map, marker);
@@ -367,11 +374,8 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
             if (status === google.maps.places.PlacesServiceStatus.OK) {
                  if (place.geometry && place.geometry.location && map) {
                      map.panTo(place.geometry.location);
-                     new google.maps.Marker({
-                         map: map,
-                         position: place.geometry.location,
-                         title: place.name
-                     });
+                     // Marker creation removed to avoid forced pinning.
+                     // Use searchPlaces if you want markers.
                  }
                  resolve(JSON.stringify(place, null, 2));
             } else {
@@ -421,9 +425,18 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
              } else {
                  resolve(`Elevation request failed: ${status}`);
              }
-         });
-      });
-  }
-  
-  return `Error: Unknown tool command '${functionName}'.`;
-}
+                   });
+               });
+           }
+         
+           else if (functionName === "clearMarkers") {
+               clearPlacesMarkers();
+               if (directionsRenderer) {
+                   directionsRenderer.setMap(null);
+                   directionsRenderer = null;
+               }
+               return "Successfully cleared all markers and directions from the map.";
+           }
+           
+           return `Error: Unknown tool command '${functionName}'.`;
+         }

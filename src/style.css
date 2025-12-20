@@ -256,3 +256,7 @@ html, body {
   display: block;
   transition: transform 0.1s linear;
 }
+
+gmp-place-details-compact {
+  min-width: 400px;
+}

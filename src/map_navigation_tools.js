@@ -1,11 +1,11 @@
 export const mapNavigationTools = [
   {
     name: "panToLocation",
-    description: "Moves the map center to a specific city or place by name using smooth animation.",
+    description: "Moves the map view to a specific address, city, landmark, or location name. Use this for navigation commands like 'Go to X', 'Fly to Y', 'Show me Z'. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
-        locationName: { type: "STRING", description: "The name of the city or place" },
+        locationName: { type: "STRING", description: "The name of the city, address, or landmark." },
       },
       required: ["locationName"],
     },

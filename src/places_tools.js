@@ -1,7 +1,7 @@
 export const placesTools = [
   {
     name: "searchPlaces",
-    description: "Search for places using Google Places text search (e.g., 'restaurants nearby', 'museums in Paris').",
+    description: "Search for places to display on the map with markers. Use this when the user explicitly asks to 'Find', 'Search', 'Locate', or 'Show markers' for specific types of places (e.g., 'gas stations', 'restaurants') or specific POIs to see their location pinned.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -54,6 +54,14 @@ export const placesTools = [
         lng: { type: "NUMBER", description: "Longitude of the location." }
       },
       required: ["lat", "lng"],
+    },
+  },
+  {
+    name: "clearMarkers",
+    description: "Removes all search markers, pins, and info windows from the map. Use this when the user says 'clear the map', 'remove markers', 'hide pins', or 'start over'.",
+    parameters: {
+      type: "OBJECT",
+      properties: {},
     },
   }
 ];
