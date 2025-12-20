@@ -319,8 +319,13 @@ export async function executeMapCommand(
             filteredResults = filteredResults.slice(0, args.maxResults);
           }
 
-          if (args.minResults !== undefined && filteredResults.length < args.minResults) {
-            console.warn(`Only found ${filteredResults.length} results, which is less than the requested minimum of ${args.minResults}.`);
+          if (
+            args.minResults !== undefined &&
+            filteredResults.length < args.minResults
+          ) {
+            console.warn(
+              `Only found ${filteredResults.length} results, which is less than the requested minimum of ${args.minResults}.`
+            );
           }
 
           // Clear old markers
@@ -372,7 +377,9 @@ export async function executeMapCommand(
           const summary = filteredResults
             .map((p) => `${p.name} (${p.rating}★) - ${p.formatted_address}`)
             .join("\n");
-          resolve(`Found ${filteredResults.length} places. Results:\n${summary}`);
+          resolve(
+            `Found ${filteredResults.length} places. Results:\n${summary}`
+          );
         } else {
           resolve(`No places found or error: ${status}`);
         }

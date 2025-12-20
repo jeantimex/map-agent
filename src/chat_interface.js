@@ -1,3 +1,5 @@
+import { marked } from "marked";
+
 export function initChatInterface(onSendMessage) {
   const chatInput = document.getElementById("chat-input");
   const actionBtn = document.getElementById("action-btn");
@@ -128,7 +130,14 @@ export function addMessage(text, isUser = false) {
   const messagesContainer = document.getElementById("chat-messages");
   const messageDiv = document.createElement("div");
   messageDiv.className = `message ${isUser ? "user" : "system"}`;
-  messageDiv.textContent = text;
+
+  if (isUser) {
+    messageDiv.textContent = text;
+  } else {
+    // Parse Markdown for system messages
+    messageDiv.innerHTML = marked.parse(text);
+  }
+
   messagesContainer.appendChild(messageDiv);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
