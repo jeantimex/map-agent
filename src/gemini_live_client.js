@@ -59,15 +59,15 @@ export class GeminiLiveClient {
   sendInitialSetup() {
     const setupMessage = {
       setup: {
-        model: "models/gemini-2.0-flash-exp",
+        model: "models/gemini-3-flash-preview",
         tools: [
           {
             functionDeclarations: [...mapNavigationTools, ...placesTools],
           },
         ],
         generationConfig: {
-            responseModalities: ["AUDIO"]
-        }
+          responseModalities: ["AUDIO"],
+        },
       },
     };
     this.send(setupMessage);
@@ -114,32 +114,32 @@ export class GeminiLiveClient {
     const functionResponses = [];
 
     for (const call of functionCalls) {
-        console.log("Live Tool Call:", call.name, call.args);
-        const result = await executeMapCommand(
-            call.name,
-            call.args,
-            this.mapState.map,
-            this.mapState.geocoder,
-            this.mapState.panorama,
-            this.mapState.placesService,
-            this.mapState.directionsService,
-            this.mapState.elevationService
-        );
+      console.log("Live Tool Call:", call.name, call.args);
+      const result = await executeMapCommand(
+        call.name,
+        call.args,
+        this.mapState.map,
+        this.mapState.geocoder,
+        this.mapState.panorama,
+        this.mapState.placesService,
+        this.mapState.directionsService,
+        this.mapState.elevationService
+      );
 
-        functionResponses.push({
-            id: call.id,
-            name: call.name,
-            response: {
-                result: typeof result === 'object' ? JSON.stringify(result) : result
-            }
-        });
+      functionResponses.push({
+        id: call.id,
+        name: call.name,
+        response: {
+          result: typeof result === "object" ? JSON.stringify(result) : result,
+        },
+      });
     }
 
     // Send tool response back
     const toolResponseMessage = {
-        toolResponse: {
-            functionResponses: functionResponses
-        }
+      toolResponse: {
+        functionResponses: functionResponses,
+      },
     };
     this.send(toolResponseMessage);
   }
@@ -159,7 +159,7 @@ export class GeminiLiveClient {
     });
 
     const source = this.audioContext.createMediaStreamSource(this.mediaStream);
-    
+
     // Using ScriptProcessor for simplicity in this prototype (AudioWorklet is better for production)
     const processor = this.audioContext.createScriptProcessor(4096, 1, 1);
 
@@ -167,10 +167,10 @@ export class GeminiLiveClient {
       if (!this.isActive) return;
 
       const inputData = e.inputBuffer.getChannelData(0);
-      
+
       // Downsample/Convert to PCM 16-bit
       const pcmData = this.floatTo16BitPCM(inputData);
-      
+
       // Convert to Base64
       const base64Audio = this.arrayBufferToBase64(pcmData);
 
@@ -205,25 +205,29 @@ export class GeminiLiveClient {
   // --- Audio Output (Speaker) ---
 
   async playAudioChunk(audioData) {
-      if (!this.audioContext) return;
-      
-      // Convert PCM 16-bit to AudioBuffer
-      // Assuming 24kHz output from Gemini Live (common default)
-      // We need to verify the sample rate or decode it.
-      // Usually raw PCM comes at 24000Hz from Gemini Live unless specified.
-      
-      const float32Data = this.pcm16ToFloat32(audioData);
-      const audioBuffer = this.audioContext.createBuffer(1, float32Data.length, 24000);
-      audioBuffer.getChannelData(0).set(float32Data);
+    if (!this.audioContext) return;
 
-      const source = this.audioContext.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(this.audioContext.destination);
+    // Convert PCM 16-bit to AudioBuffer
+    // Assuming 24kHz output from Gemini Live (common default)
+    // We need to verify the sample rate or decode it.
+    // Usually raw PCM comes at 24000Hz from Gemini Live unless specified.
 
-      const currentTime = this.audioContext.currentTime;
-      const startTime = Math.max(currentTime, this.nextPlayTime);
-      source.start(startTime);
-      this.nextPlayTime = startTime + audioBuffer.duration;
+    const float32Data = this.pcm16ToFloat32(audioData);
+    const audioBuffer = this.audioContext.createBuffer(
+      1,
+      float32Data.length,
+      24000
+    );
+    audioBuffer.getChannelData(0).set(float32Data);
+
+    const source = this.audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(this.audioContext.destination);
+
+    const currentTime = this.audioContext.currentTime;
+    const startTime = Math.max(currentTime, this.nextPlayTime);
+    source.start(startTime);
+    this.nextPlayTime = startTime + audioBuffer.duration;
   }
 
   // --- Helpers ---

@@ -13,7 +13,7 @@ let mapState = {
   panorama: null,
   placesService: null,
   directionsService: null,
-  elevationService: null
+  elevationService: null,
 };
 
 // --- Live Client ---
@@ -75,72 +75,48 @@ async function initializeApp() {
     // Initialize Chat Interface
     initChatInterface(handleSendMessage);
 
-        // Initialize Gemini
+    // Initialize Gemini
 
-        initGemini();
+    initGemini();
 
-    
+    // Initialize Live Client
 
-        // Initialize Live Client
+    liveClient = new GeminiLiveClient({
+      mapState: mapState,
 
-        liveClient = new GeminiLiveClient({
+      onActiveChange: (isActive) => {
+        if (liveControl) {
+          liveControl.setLiveState(isActive);
+        }
 
-            mapState: mapState,
+        if (isActive) {
+          addMessage("Started Live Session 🎙️", false);
+        } else {
+          addMessage("Ended Live Session", false);
+        }
+      },
+    });
 
-            onActiveChange: (isActive) => {
+    // Create Live Control
 
-                if (liveControl) {
-
-                    liveControl.setLiveState(isActive);
-
-                }
-
-                if (isActive) {
-
-                    addMessage("Started Live Session 🎙️", false);
-
-                } else {
-
-                    addMessage("Ended Live Session", false);
-
-                }
-
-            }
-
-        });
-
-    
-
-        // Create Live Control
-
-        liveControl = createLiveControl(mapState.map, (shouldConnect) => {
-
-            if (shouldConnect) {
-
-                liveClient.connect();
-
-            } else {
-
-                liveClient.disconnect();
-
-            }
-
-        });
-
-        
-
-        // Add to map (above the agent control)
-
-        mapState.map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(liveControl);
-
-        
-
-        addMessage("Hello! I'm your AI Map Agent. I can move the map, zoom, search for places, and give directions. Try saying 'Go to Paris' or 'Find pizza nearby'.");
-
+    liveControl = createLiveControl(mapState.map, (shouldConnect) => {
+      if (shouldConnect) {
+        liveClient.connect();
+      } else {
+        liveClient.disconnect();
       }
+    });
 
-    }
+    // Add to map (above the agent control)
 
-    
+    mapState.map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_END].push(
+      liveControl
+    );
 
-    initializeApp();
+    addMessage(
+      "Hello! I'm your AI Map Agent. I can move the map, zoom, search for places, and give directions. Try saying 'Go to Paris' or 'Find pizza nearby'."
+    );
+  }
+}
+
+initializeApp();
