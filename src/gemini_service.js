@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { mapTools } from "./map_tools.js";
+import { mapNavigationTools } from "./map_navigation_tools.js";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -9,7 +9,7 @@ export function initGemini() {
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({
     model: "gemini-3-flash-preview",
-    tools: [{ functionDeclarations: mapTools }],
+    tools: [{ functionDeclarations: mapNavigationTools }],
   });
   
   chatSession = model.startChat();

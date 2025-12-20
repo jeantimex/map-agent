@@ -1,7 +1,7 @@
 import { initMapService } from "./map_service.js";
 import { initGemini, getChatSession } from "./gemini_service.js";
 import { initChatInterface, addMessage } from "./chat_interface.js";
-import { executeMapCommand } from "./map_tools.js";
+import { executeMapCommand } from "./tool_executor.js";
 import "./style.css";
 
 // Global state
