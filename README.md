@@ -64,32 +64,40 @@ You need API keys for the following Google Cloud services:
 ## Usage Examples
 
 ### 🎙️ Live Mode (Voice)
+
 Click the **Microphone** button in the bottom-right corner to start a real-time voice session. Try:
+
 - "Hey, take me to the Eiffel Tower and zoom in a bit."
 - "What's the elevation here?"
 - "Find some Italian restaurants in this area."
 - "Clear all markers from the map."
 
 ### 💬 Text Chat
+
 Open the chat by clicking the **Gemini agent icon** in the bottom-right corner.
 
 #### 🌍 Navigation & Exploration
+
 - "Fly to Tokyo, Japan."
 - "Go to coordinates 48.8566, 2.3522."
 - "Show me directions from San Francisco to Los Angeles."
 
 #### 🗺️ Map Control
+
 - "Zoom out to world view."
 - "Switch to satellite view."
 - "Tilt the map 45 degrees."
 
 #### 🚶 Street View
+
 - "Show Street View here."
 - "Walk north" or "Step southwest".
 - "Hide Street View."
 
 ## Code Quality
+
 The project includes **Prettier** for consistent code formatting. Run:
+
 ```bash
 npm run format
 ```

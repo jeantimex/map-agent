@@ -187,14 +187,17 @@ export class GeminiLiveClient {
     // Use AudioWorkletNode
     console.log("Loading AudioWorklet module...");
     try {
-        await this.audioContext.audioWorklet.addModule("pcm-processor.js");
-        console.log("AudioWorklet module loaded.");
+      await this.audioContext.audioWorklet.addModule("pcm-processor.js");
+      console.log("AudioWorklet module loaded.");
     } catch (e) {
-        console.error("Failed to load AudioWorklet module:", e);
-        throw e;
+      console.error("Failed to load AudioWorklet module:", e);
+      throw e;
     }
-    
-    const workletNode = new AudioWorkletNode(this.audioContext, "pcm-processor");
+
+    const workletNode = new AudioWorkletNode(
+      this.audioContext,
+      "pcm-processor"
+    );
 
     workletNode.port.onmessage = (event) => {
       if (!this.isActive) return;

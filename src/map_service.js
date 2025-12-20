@@ -19,6 +19,7 @@ export async function initMapService() {
     const { Geocoder } = await importLibrary("geocoding");
     const { StreetViewPanorama } = await importLibrary("streetView");
     await importLibrary("places");
+    await importLibrary("marker");
 
     const sfCoords = { lat: 37.7749, lng: -122.4194 };
     const geocoder = new Geocoder();
@@ -35,6 +36,7 @@ export async function initMapService() {
       streetViewControl: true,
       tiltInteractionEnabled: true,
       headingInteractionEnabled: true,
+      mapId: "DEMO_MAP_ID",
     });
 
     // PlacesService requires the map instance

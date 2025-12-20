@@ -320,14 +320,17 @@ export async function executeMapCommand(
           const bounds = new google.maps.LatLngBounds();
           results.forEach((place) => {
             if (place.geometry && place.geometry.location) {
-              const marker = new google.maps.Marker({
+              const pin = new google.maps.marker.PinElement({});
+              const marker = new google.maps.marker.AdvancedMarkerElement({
                 map: map,
                 position: place.geometry.location,
                 title: place.name,
+                gmpClickable: true,
               });
+              marker.append(pin);
 
               // Add click listener for InfoWindow
-              marker.addListener("click", () => {
+              marker.addEventListener("gmp-click", () => {
                 const content = `
                                 <gmp-place-details-compact orientation="horizontal" truncation-preferred slot="control-block-start-inline-center">
                                   <gmp-place-details-place-request place="${place.place_id}"></gmp-place-details-place-request>
