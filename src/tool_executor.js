@@ -64,10 +64,15 @@ function simulateDrag(element, startX, startY, endX, endY, duration = 500) {
 let directionsRenderer = null;
 // Global markers array to clear previous search results
 let placesMarkers = [];
+// Global info window for places
+let placesInfoWindow = null;
 
 function clearPlacesMarkers() {
     placesMarkers.forEach(m => m.setMap(null));
     placesMarkers = [];
+    if (placesInfoWindow) {
+        placesInfoWindow.close();
+    }
 }
 
 export async function executeMapCommand(functionName, args, map, geocoder, panorama, placesService, directionsService, elevationService) {
@@ -287,10 +292,15 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
   else if (functionName === "searchPlaces") {
     if (!placesService) return "Error: PlacesService not initialized.";
     
+    // Initialize InfoWindow if needed
+    if (!placesInfoWindow) {
+        placesInfoWindow = new google.maps.InfoWindow();
+    }
+
     return new Promise((resolve) => {
         const request = {
             query: args.query,
-            fields: ['name', 'geometry', 'formatted_address', 'place_id', 'rating'],
+            fields: ['name', 'geometry', 'formatted_address', 'place_id', 'rating', 'photos'],
         };
 
         if (args.biasTowardsMapCenter && map) {
@@ -312,6 +322,20 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
                             position: place.geometry.location,
                             title: place.name
                         });
+                        
+                        // Add click listener for InfoWindow
+                        marker.addListener("click", () => {
+                            const content = `
+                                <div style="padding: 5px; max-width: 200px;">
+                                    <h3 style="margin: 0 0 5px 0; font-size: 16px;">${place.name}</h3>
+                                    <p style="margin: 0 0 5px 0; font-size: 14px;">${place.rating ? `Rating: ${place.rating} ★` : ''}</p>
+                                    <p style="margin: 0; font-size: 12px; color: #555;">${place.formatted_address}</p>
+                                </div>
+                            `;
+                            placesInfoWindow.setContent(content);
+                            placesInfoWindow.open(map, marker);
+                        });
+
                         placesMarkers.push(marker);
                         bounds.extend(place.geometry.location);
                     }
