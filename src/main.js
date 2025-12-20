@@ -109,9 +109,9 @@ async function initializeApp() {
 
     // Add to map (above the agent control)
 
-    mapState.map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_END].push(
-      liveControl
-    );
+    mapState.map.controls[
+      google.maps.ControlPosition.INLINE_END_BLOCK_END
+    ].push(liveControl);
 
     addMessage(
       "Hello! I'm your AI Map Agent. I can move the map, zoom, search for places, and give directions. Try saying 'Go to Paris' or 'Find pizza nearby'."

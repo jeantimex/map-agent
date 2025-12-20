@@ -189,7 +189,8 @@ export const mapNavigationTools = [
   },
   {
     name: "zoomInMap",
-    description: "Zooms the map in (increases detail). Use this for 'Zoom in', 'Closer', 'Show me more detail'.",
+    description:
+      "Zooms the map in (increases detail). Use this for 'Zoom in', 'Closer', 'Show me more detail'.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -204,7 +205,8 @@ export const mapNavigationTools = [
   },
   {
     name: "zoomOutMap",
-    description: "Zooms the map out (decreases detail/wider view). Use this for 'Zoom out', 'Further away', 'Show world view'.",
+    description:
+      "Zooms the map out (decreases detail/wider view). Use this for 'Zoom out', 'Further away', 'Show world view'.",
     parameters: {
       type: "OBJECT",
       properties: {

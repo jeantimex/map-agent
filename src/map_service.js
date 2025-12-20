@@ -48,7 +48,9 @@ export async function initMapService() {
 
     // Create the custom agent control
     const agentControl = createAgentControl(map);
-    map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_END].push(agentControl);
+    map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_END].push(
+      agentControl
+    );
 
     // Close chat on map click
     map.addListener("click", () => {

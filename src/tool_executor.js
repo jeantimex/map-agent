@@ -160,14 +160,16 @@ export async function executeMapCommand(
     if (!map) return "Error: Map not initialized.";
     const safeArgs = args || {};
     const currentZoom = map.getZoom();
-    const newZoom = safeArgs.level !== undefined ? safeArgs.level : currentZoom + 1;
+    const newZoom =
+      safeArgs.level !== undefined ? safeArgs.level : currentZoom + 1;
     map.setZoom(newZoom);
     return `Successfully executed zoomInMap. New zoom level: ${newZoom}`;
   } else if (functionName === "zoomOutMap") {
     if (!map) return "Error: Map not initialized.";
     const safeArgs = args || {};
     const currentZoom = map.getZoom();
-    const newZoom = safeArgs.level !== undefined ? safeArgs.level : currentZoom - 1;
+    const newZoom =
+      safeArgs.level !== undefined ? safeArgs.level : currentZoom - 1;
     map.setZoom(newZoom);
     return `Successfully executed zoomOutMap. New zoom level: ${newZoom}`;
   } else if (functionName === "showStreetView") {

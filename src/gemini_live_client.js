@@ -28,6 +28,7 @@ export class GeminiLiveClient {
       this.isActive = true;
       this.onActiveChange(true);
       this.sendInitialSetup();
+      setTimeout(() => this.sendWelcomePrompt(), 100);
     };
 
     this.ws.onmessage = async (event) => {
@@ -35,7 +36,11 @@ export class GeminiLiveClient {
     };
 
     this.ws.onclose = (event) => {
-      console.log("Gemini Live WebSocket disconnected", event.code, event.reason);
+      console.log(
+        "Gemini Live WebSocket disconnected",
+        event.code,
+        event.reason
+      );
       this.isActive = false;
       this.onActiveChange(false);
       this.stopAudio();
@@ -71,6 +76,25 @@ export class GeminiLiveClient {
       },
     };
     this.send(setupMessage);
+  }
+
+  sendWelcomePrompt() {
+    const msg = {
+      clientContent: {
+        turns: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: "Please say hello and tell me you can move the map, zoom, search for places and give directions.",
+              },
+            ],
+          },
+        ],
+        turnComplete: true,
+      },
+    };
+    this.send(msg);
   }
 
   send(data) {
