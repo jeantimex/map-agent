@@ -12,16 +12,17 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: 'Google Sans', Roboto, Arial, sans-serif;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
   overflow: hidden;
 }
 
 .app-container {
-  display: block; 
+  display: block;
   height: 100vh;
   width: 100vw;
   position: relative;
@@ -62,25 +63,26 @@ html, body {
 }
 
 #map-container.split-view #map {
-  width: 50%; 
+  width: 50%;
 }
-
 
 .chat-container {
   position: absolute;
   top: 20px;
   right: 20px;
-  bottom: 80px; 
+  bottom: 80px;
   width: 350px;
   background-color: var(--chat-bg);
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border-color);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-radius: 12px;
   z-index: 1000;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  transform: translateX(120%); 
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+  transform: translateX(120%);
   opacity: 0;
   pointer-events: none;
   overflow: hidden;
@@ -172,7 +174,7 @@ html, body {
 
 #chat-input:focus {
   background-color: #fff;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .action-btn {
@@ -204,14 +206,20 @@ html, body {
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(234, 67, 53, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(234, 67, 53, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(234, 67, 53, 0);
+  }
 }
 
 /* Google Material Icons font support */
 .material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
+  font-family: "Material Symbols Outlined";
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -232,7 +240,7 @@ html, body {
   background-color: #fff;
   border: none;
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   margin: 10px;
   padding: 0;

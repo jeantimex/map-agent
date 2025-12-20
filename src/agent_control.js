@@ -1,4 +1,4 @@
-import geminiIcon from './assets/gemini_icon.svg';
+import geminiIcon from "./assets/gemini_icon.svg";
 
 /**
  * Create an agent control for:
@@ -6,13 +6,13 @@ import geminiIcon from './assets/gemini_icon.svg';
  *   2. resetting the heading and tilting of the map on click
  */
 export function createAgentControl(map) {
-  const agentControl = document.createElement('button');
-  agentControl.classList.add('agent-control');
+  const agentControl = document.createElement("button");
+  agentControl.classList.add("agent-control");
   agentControl.title = "Map Agent";
 
-  const agentIcon = document.createElement('img');
+  const agentIcon = document.createElement("img");
   agentIcon.src = geminiIcon;
-  agentIcon.classList.add('agent-icon');
+  agentIcon.classList.add("agent-icon");
   agentControl.appendChild(agentIcon);
 
   let lastHeading = map.getHeading() || 0;
@@ -24,34 +24,34 @@ export function createAgentControl(map) {
     agentIcon.style.transform = `rotateZ(${cumulativeRotation}deg) rotateX(${currentTilt}deg)`;
   };
 
-  map.addListener('heading_changed', () => {
+  map.addListener("heading_changed", () => {
     const newHeading = map.getHeading() || 0;
 
     // Avoid rotation jump.
     let diff = newHeading - lastHeading;
     if (diff < -180) diff += 360;
     if (diff > 180) diff -= 360;
-    
+
     cumulativeRotation -= diff;
     lastHeading = newHeading;
-    
+
     updateIconTransform();
   });
 
   // Listen for tilt changes
-  map.addListener('tilt_changed', () => {
+  map.addListener("tilt_changed", () => {
     currentTilt = map.getTilt() || 0;
     updateIconTransform();
   });
 
   // When the agent is clicked, toggle chat and reset map's heading and tilt
-  agentControl.addEventListener('click', () => {
-    const chatContainer = document.querySelector('.chat-container');
-    chatContainer.classList.toggle('open');
-    
+  agentControl.addEventListener("click", () => {
+    const chatContainer = document.querySelector(".chat-container");
+    chatContainer.classList.toggle("open");
+
     // Focus input if opening
-    if (chatContainer.classList.contains('open')) {
-      setTimeout(() => document.getElementById('chat-input').focus(), 300);
+    if (chatContainer.classList.contains("open")) {
+      setTimeout(() => document.getElementById("chat-input").focus(), 300);
     }
 
     map.setHeading(0);

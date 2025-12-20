@@ -12,7 +12,7 @@ export function initGemini() {
     model: "gemini-3-flash-preview",
     tools: [{ functionDeclarations: [...mapNavigationTools, ...placesTools] }],
   });
-  
+
   chatSession = model.startChat();
   return chatSession;
 }

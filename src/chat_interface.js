@@ -2,46 +2,47 @@ export function initChatInterface(onSendMessage) {
   const chatInput = document.getElementById("chat-input");
   const actionBtn = document.getElementById("action-btn");
   const actionIcon = actionBtn.querySelector("span");
-  
+
   let recognition;
   let isListening = false;
 
   // Auto-resize logic
   const adjustHeight = () => {
-    chatInput.style.height = 'auto'; // Reset height
-    chatInput.style.height = chatInput.scrollHeight + 'px'; // Set to scroll height
+    chatInput.style.height = "auto"; // Reset height
+    chatInput.style.height = chatInput.scrollHeight + "px"; // Set to scroll height
   };
 
   // Initialize Speech Recognition
-  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
     recognition.continuous = true; // Keep listening until stopped
     recognition.interimResults = true; // Show live results
-    recognition.lang = 'en-US';
+    recognition.lang = "en-US";
 
     recognition.onstart = () => {
       isListening = true;
       actionBtn.classList.add("listening");
-      actionIcon.textContent = "stop"; 
+      actionIcon.textContent = "stop";
       chatInput.placeholder = "Listening...";
     };
 
     recognition.onresult = (event) => {
-      let transcript = '';
+      let transcript = "";
       for (let i = 0; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript;
       }
       chatInput.value = transcript;
       adjustHeight(); // Resize on voice input
-      updateButtonState(); 
+      updateButtonState();
     };
 
     recognition.onend = () => {
       isListening = false;
       actionBtn.classList.remove("listening");
       chatInput.placeholder = "Type a message...";
-      updateButtonState(); 
+      updateButtonState();
     };
 
     recognition.onerror = (event) => {
@@ -89,7 +90,7 @@ export function initChatInterface(onSendMessage) {
 
     addMessage(message, true);
     chatInput.value = "";
-    chatInput.style.height = 'auto'; // Reset height after sending
+    chatInput.style.height = "auto"; // Reset height after sending
     chatInput.disabled = true;
     updateButtonState();
 
@@ -103,7 +104,7 @@ export function initChatInterface(onSendMessage) {
 
   // Event Listeners
   actionBtn.addEventListener("click", handleAction);
-  
+
   chatInput.addEventListener("input", () => {
     adjustHeight();
     updateButtonState();
@@ -117,8 +118,8 @@ export function initChatInterface(onSendMessage) {
   });
 
   // Close chat listeners
-  document.getElementById('close-chat').addEventListener('click', () => {
-    document.querySelector('.chat-container').classList.remove('open');
+  document.getElementById("close-chat").addEventListener("click", () => {
+    document.querySelector(".chat-container").classList.remove("open");
   });
 }
 
