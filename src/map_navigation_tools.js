@@ -17,7 +17,7 @@ export const mapNavigationTools = [
   {
     name: "panToCoordinates",
     description:
-      "Moves the map center to specific latitude and longitude coordinates using smooth animation.",
+      "Moves the map center to specific latitude and longitude coordinates using smooth animation. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -30,7 +30,7 @@ export const mapNavigationTools = [
   {
     name: "setCenter",
     description:
-      "Immediately sets the map center to specific latitude and longitude coordinates (no animation).",
+      "Immediately sets the map center to specific latitude and longitude coordinates (no animation). This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -43,7 +43,7 @@ export const mapNavigationTools = [
   {
     name: "panToBounds",
     description:
-      "Pans the map to contain the given bounds (south, west, north, east). Zoom is NOT changed.",
+      "Pans the map to contain the given bounds (south, west, north, east). Zoom is NOT changed. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -62,7 +62,7 @@ export const mapNavigationTools = [
   {
     name: "panBy",
     description:
-      "Pans the map by the given distance in pixels (x, y). x increases east, y increases south.",
+      "Pans the map by the given distance in pixels (x, y). x increases east, y increases south. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -81,7 +81,7 @@ export const mapNavigationTools = [
   {
     name: "setHeading",
     description:
-      "Sets the compass heading for the map in degrees from cardinal North.",
+      "Sets the compass heading for the map in degrees from cardinal North. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -95,7 +95,8 @@ export const mapNavigationTools = [
   },
   {
     name: "setTilt",
-    description: "Sets the angle of incidence of the map (tilt).",
+    description:
+      "Sets the angle of incidence of the map (tilt). This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -107,7 +108,7 @@ export const mapNavigationTools = [
   {
     name: "setMapTypeId",
     description:
-      "Sets the type of map to display. Allowed values: 'roadmap', 'satellite', 'hybrid', 'terrain'.",
+      "Sets the type of map to display. Allowed values: 'roadmap', 'satellite', 'hybrid', 'terrain'. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -122,7 +123,8 @@ export const mapNavigationTools = [
   },
   {
     name: "showStreetView",
-    description: "Shows the Street View panorama for the current map location.",
+    description:
+      "Shows the Street View panorama for the current map location. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {}, // No params needed, uses map center
@@ -130,7 +132,8 @@ export const mapNavigationTools = [
   },
   {
     name: "hideStreetView",
-    description: "Hides the Street View panorama and returns to the map view.",
+    description:
+      "Hides the Street View panorama and returns to the map view. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {},
@@ -139,7 +142,7 @@ export const mapNavigationTools = [
   {
     name: "setStreetViewPov",
     description:
-      "Rotates the camera to look in a specific direction or angle WITHOUT moving position. Use this for 'look up', 'turn right', 'look north'.",
+      "Rotates the camera to look in a specific direction or angle WITHOUT moving position. Use this for 'look up', 'turn right', 'look north'. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -159,7 +162,7 @@ export const mapNavigationTools = [
   {
     name: "navigateStreetView",
     description:
-      "Moves the position of the Street View camera to the next panorama node in the specified direction. Use this for 'walk north', 'go forward', 'move northeast', 'step south'.",
+      "Moves the position of the Street View camera to the next panorama node in the specified direction. Use this for 'walk north', 'go forward', 'move northeast', 'step south'. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -175,7 +178,7 @@ export const mapNavigationTools = [
   {
     name: "lookAroundStreetView",
     description:
-      "Simulates a mouse drag to pan/look around in Street View smoothly. Use this for 'pan left', 'look around to the right', 'drag view up'.",
+      "Simulates a mouse drag to pan/look around in Street View smoothly. Use this for 'pan left', 'look around to the right', 'drag view up'. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -190,7 +193,7 @@ export const mapNavigationTools = [
   {
     name: "zoomInMap",
     description:
-      "Zooms the map in (increases detail). Use this for 'Zoom in', 'Closer', 'Show me more detail'.",
+      "Zooms the map in (increases detail). Use this for 'Zoom in', 'Closer', 'Show me more detail'. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -206,7 +209,7 @@ export const mapNavigationTools = [
   {
     name: "zoomOutMap",
     description:
-      "Zooms the map out (decreases detail/wider view). Use this for 'Zoom out', 'Further away', 'Show world view'.",
+      "Zooms the map out (decreases detail/wider view). Use this for 'Zoom out', 'Further away', 'Show world view'. This tool does NOT create markers or pins, it only changes the view.",
     parameters: {
       type: "OBJECT",
       properties: {
