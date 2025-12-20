@@ -184,13 +184,22 @@ export class GeminiLiveClient {
 
     const source = this.audioContext.createMediaStreamSource(this.mediaStream);
 
-    // Using ScriptProcessor for simplicity in this prototype (AudioWorklet is better for production)
-    const processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+    // Use AudioWorkletNode
+    console.log("Loading AudioWorklet module...");
+    try {
+        await this.audioContext.audioWorklet.addModule("pcm-processor.js");
+        console.log("AudioWorklet module loaded.");
+    } catch (e) {
+        console.error("Failed to load AudioWorklet module:", e);
+        throw e;
+    }
+    
+    const workletNode = new AudioWorkletNode(this.audioContext, "pcm-processor");
 
-    processor.onaudioprocess = (e) => {
+    workletNode.port.onmessage = (event) => {
       if (!this.isActive) return;
 
-      const inputData = e.inputBuffer.getChannelData(0);
+      const inputData = event.data; // Float32Array from processor
 
       // Downsample/Convert to PCM 16-bit
       const pcmData = this.floatTo16BitPCM(inputData);
@@ -211,14 +220,19 @@ export class GeminiLiveClient {
       });
     };
 
-    source.connect(processor);
-    processor.connect(this.audioContext.destination);
+    source.connect(workletNode);
+    workletNode.connect(this.audioContext.destination);
+    this.workletNode = workletNode;
   }
 
   stopAudio() {
     if (this.mediaStream) {
       this.mediaStream.getTracks().forEach((track) => track.stop());
       this.mediaStream = null;
+    }
+    if (this.workletNode) {
+      this.workletNode.disconnect();
+      this.workletNode = null;
     }
     if (this.audioContext) {
       this.audioContext.close();
