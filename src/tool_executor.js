@@ -313,12 +313,22 @@ export async function executeMapCommand(
 
       placesService.textSearch(request, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+          // Filter results based on maxResults and minResults
+          let filteredResults = results;
+          if (args.maxResults !== undefined) {
+            filteredResults = filteredResults.slice(0, args.maxResults);
+          }
+
+          if (args.minResults !== undefined && filteredResults.length < args.minResults) {
+            console.warn(`Only found ${filteredResults.length} results, which is less than the requested minimum of ${args.minResults}.`);
+          }
+
           // Clear old markers
           clearPlacesMarkers();
 
           // Add new markers
           const bounds = new google.maps.LatLngBounds();
-          results.forEach((place) => {
+          filteredResults.forEach((place) => {
             if (place.geometry && place.geometry.location) {
               const pin = new google.maps.marker.PinElement({});
               const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -359,11 +369,10 @@ export async function executeMapCommand(
             map.fitBounds(bounds);
           }
 
-          const summary = results
-            .slice(0, 5)
+          const summary = filteredResults
             .map((p) => `${p.name} (${p.rating}★) - ${p.formatted_address}`)
             .join("\n");
-          resolve(`Found ${results.length} places. Top results:\n${summary}`);
+          resolve(`Found ${filteredResults.length} places. Results:\n${summary}`);
         } else {
           resolve(`No places found or error: ${status}`);
         }

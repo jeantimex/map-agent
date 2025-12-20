@@ -19,6 +19,14 @@ export const placesTools = [
           description:
             "Whether to bias the search results towards the current map center (default: true).",
         },
+        maxResults: {
+          type: "NUMBER",
+          description: "The maximum number of results to display.",
+        },
+        minResults: {
+          type: "NUMBER",
+          description: "The minimum number of results to display.",
+        },
       },
       required: ["query"],
     },
