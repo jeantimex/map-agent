@@ -60,7 +60,17 @@ function simulateDrag(element, startX, startY, endX, endY, duration = 500) {
   animateDrag();
 }
 
-export async function executeMapCommand(functionName, args, map, geocoder, panorama) {
+// Global directions renderer to manage route display
+let directionsRenderer = null;
+// Global markers array to clear previous search results
+let placesMarkers = [];
+
+function clearPlacesMarkers() {
+    placesMarkers.forEach(m => m.setMap(null));
+    placesMarkers = [];
+}
+
+export async function executeMapCommand(functionName, args, map, geocoder, panorama, placesService, directionsService, elevationService) {
   console.log(`Executing tool: ${functionName}`, args);
 
   if (functionName === "panToLocation") {
@@ -249,12 +259,6 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
     }
 
     const panoDiv = document.getElementById("pano");
-    // We need a specific element to dispatch events to. The canvas usually captures them.
-    // However, dispatching to the container usually bubbles down or is captured if we are lucky,
-    // but Google Maps events often listen on the widget container.
-    // Let's try finding the widget canvas or the container itself.
-    // A safe bet is the 'widget-scene-canvas' or just the #pano div if it captures bubbles.
-    // Let's inspect: usually there is a canvas inside.
     
     const rect = panoDiv.getBoundingClientRect();
     const startX = rect.left + rect.width / 2;
@@ -264,11 +268,6 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
     let endY = startY;
     const delta = 200; // Pixels to drag
 
-    // To look LEFT, we drag the scene RIGHT (positive X)
-    // To look RIGHT, we drag the scene LEFT (negative X)
-    // To look UP, we drag the scene DOWN (positive Y)
-    // To look DOWN, we drag the scene UP (negative Y)
-    
     const direction = args.direction.toLowerCase();
     
     if (direction === "left") endX += delta;
@@ -277,12 +276,129 @@ export async function executeMapCommand(functionName, args, map, geocoder, panor
     else if (direction === "down") endY -= delta;
     else return "Error: Invalid direction. Use left, right, up, or down.";
 
-    // Target the canvas if possible, otherwise the div
     const targetElement = panoDiv.querySelector('canvas') || panoDiv;
-
     simulateDrag(targetElement, startX, startY, endX, endY);
     
     return `Successfully simulated mouse drag to look ${direction}.`;
+  }
+
+  // --- Places Tools ---
+
+  else if (functionName === "searchPlaces") {
+    if (!placesService) return "Error: PlacesService not initialized.";
+    
+    return new Promise((resolve) => {
+        const request = {
+            query: args.query,
+            fields: ['name', 'geometry', 'formatted_address', 'place_id', 'rating'],
+        };
+
+        if (args.biasTowardsMapCenter && map) {
+             request.location = map.getCenter();
+             if (args.radius) request.radius = args.radius;
+        }
+
+        placesService.textSearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                // Clear old markers
+                clearPlacesMarkers();
+
+                // Add new markers
+                const bounds = new google.maps.LatLngBounds();
+                results.forEach(place => {
+                    if (place.geometry && place.geometry.location) {
+                        const marker = new google.maps.Marker({
+                            map: map,
+                            position: place.geometry.location,
+                            title: place.name
+                        });
+                        placesMarkers.push(marker);
+                        bounds.extend(place.geometry.location);
+                    }
+                });
+                
+                if (map && !args.biasTowardsMapCenter) { // Only adjust bounds if we didn't strictly bias to current view
+                    map.fitBounds(bounds);
+                }
+                
+                const summary = results.slice(0, 5).map(p => `${p.name} (${p.rating}★) - ${p.formatted_address}`).join('\n');
+                resolve(`Found ${results.length} places. Top results:\n${summary}`);
+            } else {
+                resolve(`No places found or error: ${status}`);
+            }
+        });
+    });
+  }
+
+  else if (functionName === "getPlaceDetails") {
+    if (!placesService) return "Error: PlacesService not initialized.";
+
+    return new Promise((resolve) => {
+        const request = {
+            placeId: args.placeId,
+            fields: args.fields || ['name', 'formatted_address', 'geometry', 'rating', 'formatted_phone_number']
+        };
+
+        placesService.getDetails(request, (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                 if (place.geometry && place.geometry.location && map) {
+                     map.panTo(place.geometry.location);
+                     new google.maps.Marker({
+                         map: map,
+                         position: place.geometry.location,
+                         title: place.name
+                     });
+                 }
+                 resolve(JSON.stringify(place, null, 2));
+            } else {
+                resolve(`Error getting place details: ${status}`);
+            }
+        });
+    });
+  }
+
+  else if (functionName === "getDirections") {
+    if (!directionsService) return "Error: DirectionsService not initialized.";
+    
+    // Initialize Renderer if needed (lazy init)
+    if (!directionsRenderer && map) {
+         // We need to access google namespace which is global
+         directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+    }
+
+    return new Promise((resolve) => {
+        directionsService.route({
+            origin: args.origin,
+            destination: args.destination,
+            travelMode: google.maps.TravelMode[args.travelMode || 'DRIVING']
+        }, (response, status) => {
+            if (status === 'OK') {
+                if (directionsRenderer) {
+                    directionsRenderer.setDirections(response);
+                }
+                const route = response.routes[0];
+                const leg = route.legs[0];
+                resolve(`Directions found: ${leg.distance.text} (${leg.duration.text}). Start at ${leg.start_address}, go to ${leg.end_address}.`);
+            } else {
+                resolve(`Directions request failed due to ${status}`);
+            }
+        });
+    });
+  }
+
+  else if (functionName === "getElevation") {
+      if (!elevationService) return "Error: ElevationService not initialized.";
+      
+      return new Promise((resolve) => {
+         const locations = [{ lat: args.lat, lng: args.lng }];
+         elevationService.getElevationForLocations({ locations }, (results, status) => {
+             if (status === 'OK' && results[0]) {
+                 resolve(`Elevation at ${args.lat}, ${args.lng} is ${results[0].elevation.toFixed(2)} meters.`);
+             } else {
+                 resolve(`Elevation request failed: ${status}`);
+             }
+         });
+      });
   }
   
   return `Error: Unknown tool command '${functionName}'.`;

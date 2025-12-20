@@ -8,7 +8,10 @@ import "./style.css";
 let mapState = {
   map: null,
   geocoder: null,
-  panorama: null
+  panorama: null,
+  placesService: null,
+  directionsService: null,
+  elevationService: null
 };
 
 // --- Core Logic ---
@@ -29,7 +32,10 @@ async function handleSendMessage(message) {
           call.args, 
           mapState.map, 
           mapState.geocoder, 
-          mapState.panorama
+          mapState.panorama,
+          mapState.placesService,
+          mapState.directionsService,
+          mapState.elevationService
         );
         
         const resultParts = [
@@ -67,7 +73,7 @@ async function initializeApp() {
     // Initialize Gemini
     initGemini();
     
-    addMessage("Hello! I'm your AI Map Agent. I can move the map and zoom for you. Try saying 'Go to Paris' or 'Zoom in'.");
+    addMessage("Hello! I'm your AI Map Agent. I can move the map, zoom, search for places, and give directions. Try saying 'Go to Paris' or 'Find pizza nearby'.");
   }
 }
 
