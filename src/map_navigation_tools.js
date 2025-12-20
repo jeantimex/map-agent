@@ -188,18 +188,33 @@ export const mapNavigationTools = [
     },
   },
   {
-    name: "zoomMap",
-    description: "Zooms the map in or out.",
+    name: "zoomInMap",
+    description: "Zooms the map in (increases detail). Use this for 'Zoom in', 'Closer', 'Show me more detail'.",
     parameters: {
       type: "OBJECT",
       properties: {
         level: {
           type: "NUMBER",
           description:
-            "Zoom level (1-20). 1 is world view, 20 is building view.",
+            "Optional specific zoom level (1-20). If omitted, zooms in by one step.",
         },
       },
-      required: ["level"],
+      required: [], // Optional
+    },
+  },
+  {
+    name: "zoomOutMap",
+    description: "Zooms the map out (decreases detail/wider view). Use this for 'Zoom out', 'Further away', 'Show world view'.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        level: {
+          type: "NUMBER",
+          description:
+            "Optional specific zoom level (1-20). If omitted, zooms out by one step.",
+        },
+      },
+      required: [], // Optional
     },
   },
 ];

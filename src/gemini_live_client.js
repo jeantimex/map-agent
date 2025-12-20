@@ -34,8 +34,8 @@ export class GeminiLiveClient {
       await this.handleMessage(event.data);
     };
 
-    this.ws.onclose = () => {
-      console.log("Gemini Live WebSocket disconnected");
+    this.ws.onclose = (event) => {
+      console.log("Gemini Live WebSocket disconnected", event.code, event.reason);
       this.isActive = false;
       this.onActiveChange(false);
       this.stopAudio();
@@ -59,7 +59,7 @@ export class GeminiLiveClient {
   sendInitialSetup() {
     const setupMessage = {
       setup: {
-        model: "models/gemini-3-flash-preview",
+        model: "models/gemini-2.5-flash-native-audio-preview-12-2025",
         tools: [
           {
             functionDeclarations: [...mapNavigationTools, ...placesTools],

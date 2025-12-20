@@ -156,10 +156,20 @@ export async function executeMapCommand(
     }
     map.setMapTypeId(args.mapTypeId);
     return `Successfully executed map.setMapTypeId('${args.mapTypeId}')`;
-  } else if (functionName === "zoomMap") {
+  } else if (functionName === "zoomInMap") {
     if (!map) return "Error: Map not initialized.";
-    map.setZoom(args.level);
-    return `Successfully executed map.setZoom(${args.level})`;
+    const safeArgs = args || {};
+    const currentZoom = map.getZoom();
+    const newZoom = safeArgs.level !== undefined ? safeArgs.level : currentZoom + 1;
+    map.setZoom(newZoom);
+    return `Successfully executed zoomInMap. New zoom level: ${newZoom}`;
+  } else if (functionName === "zoomOutMap") {
+    if (!map) return "Error: Map not initialized.";
+    const safeArgs = args || {};
+    const currentZoom = map.getZoom();
+    const newZoom = safeArgs.level !== undefined ? safeArgs.level : currentZoom - 1;
+    map.setZoom(newZoom);
+    return `Successfully executed zoomOutMap. New zoom level: ${newZoom}`;
   } else if (functionName === "showStreetView") {
     if (!panorama) return "Error: Street View not initialized.";
 
