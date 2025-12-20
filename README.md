@@ -6,26 +6,30 @@ https://github.com/user-attachments/assets/643182ca-0db7-4723-bf15-b5d49049cacf
 
 ## Features
 
-- **Natural Language Navigation**: Ask the agent to "Go to Tokyo", "Zoom in", "Show me the Eiffel Tower", or "Pan to coordinates".
-- **AI-Driven Control**: Uses the Gemini API to understand intent and execute Google Maps commands (pan, zoom, tilt, heading).
-- **Street View Integration**: Simply ask to "Show Street View" to open a split-screen panorama view alongside the map.
-- **Interactive Street View**: Navigate within Street View naturally by asking to "walk north", "look left", or "turn around".
-- **3D Map Capabilities**: Supports vector maps with tilt and heading control for immersive 3D exploration.
-- **Interactive Agent UI**: A floating agent button with a 3D-styled icon that reacts to map orientation (heading/tilt) and toggles the chat interface.
-- **Map Types**: Switch between Roadmap, Satellite, Hybrid, and Terrain views on command.
+- **🎙️ Gemini Multimodal Live**: Real-time voice conversation with the map agent. Talk naturally, and the map reacts instantly.
+- **📍 Smart Place Exploration**: Search for places, see markers, and view rich place details with interactive InfoWindows.
+- **🌍 Natural Language Navigation**: Ask the agent to "Go to Tokyo", "Zoom in", "Show me the Eiffel Tower", or "Pan to coordinates".
+- **🤖 AI-Driven Control**: Uses the Gemini API to understand intent and execute Google Maps commands (pan, zoom, tilt, heading).
+- **🚶 Street View Integration**: Simply ask to "Show Street View" to open a split-screen panorama view. Navigate by saying "walk north" or "look left".
+- **🏢 3D Map Capabilities**: Supports vector maps with tilt and heading control for immersive 3D exploration.
+- **✨ Interactive Agent UI**: Reactive 3D-styled agent button and real-time voice interaction toggle.
+- **🗺️ Map Types**: Switch between Roadmap, Satellite, Hybrid, and Terrain views on command.
 
 ## Tech Stack
 
 - **Frontend**: Vanilla JavaScript (ES Modules), HTML5, CSS3
 - **Build Tool**: Vite
-- **AI Model**: Google Gemini 2.0 Flash (via `@google/generative-ai`)
+- **AI Models**:
+  - **Text Chat**: Gemini 3 Flash Preview
+  - **Multimodal Live**: Gemini 2.5 Flash Native Audio Preview
 - **Maps**: Google Maps JavaScript API (via `@googlemaps/js-api-loader`)
+- **Real-time**: WebSockets for Gemini Live, AudioWorklet for low-latency audio processing.
 
 ## Prerequisites
 
 You need API keys for the following Google Cloud services:
 
-1.  **Google Maps JavaScript API** (Enable "Maps JavaScript API", "Geocoding API", and "Places API").
+1.  **Google Maps JavaScript API** (Enable "Maps JavaScript API", "Geocoding API", "Places API", "Directions API", and "Elevation API").
 2.  **Google Gemini API** (Get an API key from [Google AI Studio](https://aistudio.google.com/)).
 
 ## Setup & Installation
@@ -59,35 +63,36 @@ You need API keys for the following Google Cloud services:
 
 ## Usage Examples
 
-Open the chat by clicking the Gemini agent icon in the bottom-right corner. Try these commands:
+### 🎙️ Live Mode (Voice)
+Click the **Microphone** button in the bottom-right corner to start a real-time voice session. Try:
+- "Hey, take me to the Eiffel Tower and zoom in a bit."
+- "What's the elevation here?"
+- "Find some Italian restaurants in this area."
+- "Clear all markers from the map."
 
-### 🌍 Navigation & Exploration
+### 💬 Text Chat
+Open the chat by clicking the **Gemini agent icon** in the bottom-right corner.
 
-- "Take me to the Golden Gate Bridge."
+#### 🌍 Navigation & Exploration
 - "Fly to Tokyo, Japan."
-- "Show me Central Park in New York."
 - "Go to coordinates 48.8566, 2.3522."
+- "Show me directions from San Francisco to Los Angeles."
 
-### 🗺️ Map Control
-
-- "Zoom in closer."
+#### 🗺️ Map Control
 - "Zoom out to world view."
-- "Pan slightly to the right."
 - "Switch to satellite view."
-- "Show me the terrain map."
-
-### 🏢 3D & Perspective
-
 - "Tilt the map 45 degrees."
-- "Rotate the map 90 degrees."
-- "Show me a 3D view of the city."
 
-### 🚶 Street View & Panoramas
+#### 🚶 Street View
+- "Show Street View here."
+- "Walk north" or "Step southwest".
+- "Hide Street View."
 
-- **Activation**: "Show Street View here." (Opens split-screen mode)
-- **Look Around**: "Look to the left", "Look up at the sky", "Pan right".
-- **Movement**: "Walk north", "Go forward", "Step southwest".
-- **Deactivation**: "Hide Street View", "Go back to the map".
+## Code Quality
+The project includes **Prettier** for consistent code formatting. Run:
+```bash
+npm run format
+```
 
 ## License
 
