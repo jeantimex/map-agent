@@ -25,21 +25,17 @@ export function createSidePanel() {
   const backBtn = panel.querySelector("#back-to-list");
   const title = panel.querySelector("#panel-title");
 
-  toggleBtn.addEventListener("click", () => {
-    // Determine which view is active to toggle correctly
-    const activeContent = details.style.display === "block" ? details : list;
+  // Track the currently active view (list or details)
+  let activeView = list;
 
-    if (activeContent.style.display === "none") {
-      // It was collapsed, so expand it
-      if (details.innerHTML.trim() !== "" && list.style.display === "none") {
-        details.style.display = "block";
-      } else {
-        list.style.display = "flex";
-      }
+  toggleBtn.addEventListener("click", () => {
+    // If the active view is currently hidden, show it (Expand)
+    if (activeView.style.display === "none") {
+      activeView.style.display = activeView === list ? "flex" : "block";
       toggleBtn.textContent = "▼";
     } else {
-      // It was expanded, so collapse it
-      activeContent.style.display = "none";
+      // Otherwise, hide it (Collapse)
+      activeView.style.display = "none";
       toggleBtn.textContent = "▲";
     }
   });
@@ -50,8 +46,26 @@ export function createSidePanel() {
     list.style.display = "flex";
     backBtn.style.display = "none";
     title.textContent = "Places Found";
-    toggleBtn.textContent = "▼"; // Ensure it shows as expanded
+    toggleBtn.textContent = "▼";
+    
+    // Update state
+    activeView = list;
   });
+  
+  // ... (inside updatePlacesPanel) ...
+  // ensure we capture the state change when switching to details
+  // We need to expose a way to update `activeView` or handle it inside.
+  // Since `updatePlacesPanel` is outside, we can attach the logic to the element or move `activeView` scope.
+  // Ideally, `createSidePanel` should handle the view switching logic internally or expose methods.
+  
+  // Let's attach the state to the panel element for simplicity in this refactor
+  panel.setActiveView = (viewName) => {
+      if (viewName === 'details') {
+          activeView = details;
+      } else {
+          activeView = list;
+      }
+  };
 
   return panel;
 }
@@ -70,6 +84,7 @@ export function updatePlacesPanel(places) {
   details.style.display = "none";
   backBtn.style.display = "none";
   title.textContent = "Places Found";
+  if (panel.setActiveView) panel.setActiveView('list');
 
   if (places && places.length > 0) {
     panel.style.display = "flex";
@@ -78,6 +93,7 @@ export function updatePlacesPanel(places) {
     list.innerHTML = "";
 
     places.forEach((place) => {
+      // ... (create item) ...
       const item = document.createElement("div");
       item.className = "place-item";
       item.innerHTML = `
@@ -108,8 +124,11 @@ export function updatePlacesPanel(places) {
   function showPlaceDetails(place) {
     list.style.display = "none";
     details.style.display = "block";
-    backBtn.style.display = "block";
-    title.textContent = place.name; // Or "Place Details"
+    backBtn.style.display = "flex";
+    title.textContent = place.name;
+    
+    // Update active view state
+    if (panel.setActiveView) panel.setActiveView('details');
 
     details.innerHTML = `
       <gmp-place-details>
