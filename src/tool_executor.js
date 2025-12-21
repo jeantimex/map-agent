@@ -328,7 +328,7 @@ export async function executeMapCommand(
           clearPlacesMarkers();
 
           // Update Side Panel
-          updatePlacesPanel(filteredResults);
+          updatePlacesPanel(filteredResults, map);
 
           // Add new markers
           const bounds = new google.maps.LatLngBounds();

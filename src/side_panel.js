@@ -53,13 +53,20 @@ export function createSidePanel() {
     
     // Update state
     activeView = list;
+
+    // Fit bounds to show all places again
+    if (panel.placesData && panel.placesData.length > 0 && panel.mapInstance) {
+        const bounds = new google.maps.LatLngBounds();
+        panel.placesData.forEach(p => {
+            if (p.geometry && p.geometry.location) {
+                bounds.extend(p.geometry.location);
+            }
+        });
+        panel.mapInstance.fitBounds(bounds, 100);
+    }
   });
   
   // ... (inside updatePlacesPanel) ...
-  // ensure we capture the state change when switching to details
-  // We need to expose a way to update `activeView` or handle it inside.
-  // Since `updatePlacesPanel` is outside, we can attach the logic to the element or move `activeView` scope.
-  // Ideally, `createSidePanel` should handle the view switching logic internally or expose methods.
   
   // Let's attach the state to the panel element for simplicity in this refactor
   panel.setActiveView = (viewName) => {
@@ -74,8 +81,15 @@ export function createSidePanel() {
   return panel;
 }
 
-export function updatePlacesPanel(places) {
+export function updatePlacesPanel(places, map) {
   const panel = document.getElementById("places-panel");
+  
+  // Store data for back button functionality
+  if (panel) {
+      panel.placesData = places;
+      panel.mapInstance = map;
+  }
+
   const list = document.getElementById("places-list");
   const details = document.getElementById("place-details");
   const backBtn = document.getElementById("back-to-list");
@@ -89,22 +103,21 @@ export function updatePlacesPanel(places) {
   details.style.display = "none";
   backBtn.style.display = "none";
   title.textContent = "Places Found";
-  if (panel.setActiveView) panel.setActiveView('list');
+  if (panel.setActiveView) panel.setActiveView("list");
 
   if (places && places.length > 0) {
     panel.style.display = "flex";
     list.style.display = "flex";
     toggleBtn.textContent = "▼";
     list.innerHTML = "";
-    
+
     // Update count
     if (countBadge) {
-        countBadge.textContent = places.length;
-        countBadge.style.display = "inline-block";
+      countBadge.textContent = places.length;
+      countBadge.style.display = "inline-block";
     }
 
     places.forEach((place) => {
-      // ... (create item) ...
       const item = document.createElement("div");
       item.className = "place-item";
       item.innerHTML = `
@@ -123,6 +136,11 @@ export function updatePlacesPanel(places) {
       `;
 
       item.addEventListener("click", () => {
+        // Center and zoom map on click
+        if (map && place.geometry && place.geometry.location) {
+          map.setCenter(place.geometry.location);
+          map.setZoom(15);
+        }
         showPlaceDetails(place);
       });
 
