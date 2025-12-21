@@ -2,7 +2,7 @@ export const placesTools = [
   {
     name: "searchPlaces",
     description:
-      "Search for places to display on the map with markers. Use this when the user explicitly asks to 'Find', 'Search', 'Locate', or 'Show markers' for specific types of places (e.g., 'gas stations', 'restaurants') or specific POIs to see their location pinned.",
+      "Search for places using a free-form text query. Use this for specific names (e.g., 'Starbucks', 'Eiffel Tower'), subjective queries (e.g., 'best pizza', 'romantic dinner'), or vague requests that don't map to a specific place type. This is the default tool for most 'find' or 'search' requests.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -29,6 +29,41 @@ export const placesTools = [
         },
       },
       required: ["query"],
+    },
+  },
+  {
+    name: "searchNearby",
+    description:
+      "Search for places near the map center using strict CATEGORIES (Place Types). Use this ONLY when the user asks for a specific category (e.g., 'gas stations', 'ATMs', 'parks') and you can map it to a valid Google Maps Place Type (e.g., 'gas_station', 'atm', 'park'). Do NOT use this for specific names or subjective queries.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        radius: {
+          type: "NUMBER",
+          description: "Radius in meters for the search (required).",
+        },
+        includedTypes: {
+          type: "ARRAY",
+          items: { type: "STRING" },
+          description:
+            "List of place types to include (e.g., 'restaurant', 'gas_station'). See Google Maps Place Types.",
+        },
+        excludedTypes: {
+          type: "ARRAY",
+          items: { type: "STRING" },
+          description: "List of place types to exclude.",
+        },
+        maxResultCount: {
+          type: "NUMBER",
+          description: "Maximum number of results to return (default 20).",
+        },
+        rankPreference: {
+          type: "STRING",
+          description: "Ranking preference: 'POPULARITY' or 'DISTANCE'.",
+          enum: ["POPULARITY", "DISTANCE"],
+        },
+      },
+      required: ["radius", "includedTypes"],
     },
   },
   {

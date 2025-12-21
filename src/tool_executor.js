@@ -428,6 +428,115 @@ export async function executeMapCommand(
     } catch (error) {
       return `Error searching for places: ${error.message}`;
     }
+  } else if (functionName === "searchNearby") {
+    if (!google.maps.places) return "Error: Places library not loaded.";
+
+    try {
+      const request = {
+        fields: [
+          "id",
+          "displayName",
+          "formattedAddress",
+          "location",
+          "rating",
+          "photos",
+          "svgIconMaskURI",
+          "iconBackgroundColor",
+        ],
+        locationRestriction: {
+          center: map.getCenter(),
+          radius: args.radius,
+        },
+      };
+
+      if (args.includedTypes) request.includedTypes = args.includedTypes;
+      if (args.excludedTypes) request.excludedTypes = args.excludedTypes;
+      if (args.maxResultCount) request.maxResultCount = args.maxResultCount;
+      if (args.rankPreference) {
+        request.rankPreference =
+          google.maps.places.SearchNearbyRankPreference[args.rankPreference];
+      }
+
+      const { places } = await google.maps.places.Place.searchNearby(request);
+
+      if (places && places.length > 0) {
+        const adaptedResults = places.map((p) => ({
+          place_id: p.id,
+          name: p.displayName,
+          formatted_address: p.formattedAddress,
+          geometry: { location: p.location },
+          rating: p.rating,
+          photos: p.photos,
+          icon_mask_base_uri: p.svgIconMaskURI,
+          icon_background_color: p.iconBackgroundColor,
+        }));
+
+        clearPlacesMarkers();
+        updatePlacesPanel(adaptedResults, map, markerCallbacks);
+
+        const bounds = new google.maps.LatLngBounds();
+        adaptedResults.forEach((place) => {
+          if (place.geometry && place.geometry.location) {
+            const pin = new google.maps.marker.PinElement({
+              background: place.icon_background_color || null,
+              borderColor: place.icon_background_color || null,
+              glyphSrc: place.icon_mask_base_uri
+                ? new URL(String(place.icon_mask_base_uri))
+                : undefined,
+            });
+            const marker = new google.maps.marker.AdvancedMarkerElement({
+              map: map,
+              position: place.geometry.location,
+              title: place.name,
+              gmpClickable: true,
+            });
+            marker.element.id = `place_marker${place.place_id}`;
+            marker.originalColor = place.icon_background_color;
+            marker.append(pin);
+
+            marker.addEventListener("gmp-click", () => {
+              if (map && place.geometry && place.geometry.location) {
+                const currentBounds = map.getBounds();
+                const currentZoom = map.getZoom();
+                const isInBounds =
+                  currentBounds &&
+                  currentBounds.contains(place.geometry.location);
+
+                if (!(isInBounds && currentZoom >= 15)) {
+                  map.setCenter(place.geometry.location);
+                  map.setZoom(15);
+                }
+              }
+              showPlaceDetails(place);
+            });
+
+            marker.element.addEventListener("mouseenter", () => {
+              markerCallbacks.onMouseEnter(place.place_id);
+            });
+
+            marker.element.addEventListener("mouseleave", () => {
+              markerCallbacks.onMouseLeave(place.place_id);
+            });
+
+            placesMarkers.push(marker);
+            bounds.extend(place.geometry.location);
+          }
+        });
+
+        if (map) {
+          map.fitBounds(bounds, 100);
+        }
+
+        const summary = adaptedResults
+          .map((p) => `${p.name} (${p.rating}★) - ${p.formatted_address}`)
+          .join("\n");
+        return `Found ${adaptedResults.length} places nearby. Results:\n${summary}`;
+      } else {
+        return "No places found nearby.";
+      }
+    } catch (error) {
+      return `Error searching nearby: ${error.message}`;
+    }
   } else if (functionName === "getPlaceDetailsByLocation") {
     if (!google.maps.places) return "Error: Places library not loaded.";
 
