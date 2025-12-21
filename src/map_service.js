@@ -60,8 +60,12 @@ export async function initMapService() {
       document.querySelector(".chat-container").classList.remove("open");
     });
 
+    let centerDebounceTimer;
     map.addListener("center_changed", () => {
-      panorama.setPosition(map.getCenter());
+      clearTimeout(centerDebounceTimer);
+      centerDebounceTimer = setTimeout(() => {
+        panorama.setPosition(map.getCenter());
+      }, 500);
     });
 
     return {
