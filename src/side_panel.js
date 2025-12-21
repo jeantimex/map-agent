@@ -8,6 +8,7 @@ export function createSidePanel() {
           <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
         </button>
         <span id="panel-title">Places Found</span>
+        <span id="places-count" style="margin-left: 8px; background-color: var(--primary-color); color: white; border-radius: 12px; padding: 2px 8px; font-size: 12px; font-weight: bold; display: none;"></span>
       </div>
       <button id="toggle-panel">▼</button>
     </div>
@@ -24,6 +25,7 @@ export function createSidePanel() {
   const details = panel.querySelector("#place-details");
   const backBtn = panel.querySelector("#back-to-list");
   const title = panel.querySelector("#panel-title");
+  const count = panel.querySelector("#places-count");
 
   // Track the currently active view (list or details)
   let activeView = list;
@@ -46,6 +48,7 @@ export function createSidePanel() {
     list.style.display = "flex";
     backBtn.style.display = "none";
     title.textContent = "Places Found";
+    count.style.display = "inline-block";
     toggleBtn.textContent = "▼";
     
     // Update state
@@ -62,7 +65,8 @@ export function createSidePanel() {
   panel.setActiveView = (viewName) => {
       if (viewName === 'details') {
           activeView = details;
-      } else {
+      }
+      else {
           activeView = list;
       }
   };
@@ -76,6 +80,7 @@ export function updatePlacesPanel(places) {
   const details = document.getElementById("place-details");
   const backBtn = document.getElementById("back-to-list");
   const title = document.getElementById("panel-title");
+  const countBadge = document.getElementById("places-count");
   const toggleBtn = document.getElementById("toggle-panel");
 
   if (!panel || !list) return;
@@ -91,6 +96,12 @@ export function updatePlacesPanel(places) {
     list.style.display = "flex";
     toggleBtn.textContent = "▼";
     list.innerHTML = "";
+    
+    // Update count
+    if (countBadge) {
+        countBadge.textContent = places.length;
+        countBadge.style.display = "inline-block";
+    }
 
     places.forEach((place) => {
       // ... (create item) ...
@@ -119,6 +130,7 @@ export function updatePlacesPanel(places) {
     });
   } else {
     panel.style.display = "none";
+    if (countBadge) countBadge.style.display = "none";
   }
 
   function showPlaceDetails(place) {
@@ -126,6 +138,7 @@ export function updatePlacesPanel(places) {
     details.style.display = "block";
     backBtn.style.display = "flex";
     title.textContent = place.name;
+    if (countBadge) countBadge.style.display = "none";
     
     // Update active view state
     if (panel.setActiveView) panel.setActiveView('details');
