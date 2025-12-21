@@ -478,33 +478,39 @@ export async function executeMapCommand(
       });
     });
   } else if (functionName === "getPlaceDetailsByPlaceId") {
-    if (!placesService) return "Error: PlacesService not initialized.";
+    if (!google.maps.places) return "Error: Places library not loaded.";
 
-    return new Promise((resolve) => {
-      const request = {
-        placeId: args.placeId,
-        fields: args.fields || [
-          "name",
-          "formatted_address",
-          "geometry",
-          "rating",
-          "formatted_phone_number",
-        ],
+    try {
+      const place = new google.maps.places.Place({
+        id: args.placeId,
+      });
+
+      const fields = [
+        "displayName",
+        "formattedAddress",
+        "location",
+        "rating",
+        "nationalPhoneNumber",
+      ];
+
+      await place.fetchFields({ fields });
+
+      const result = {
+        displayName: place.displayName,
+        formattedAddress: place.formattedAddress,
+        location: place.location,
+        rating: place.rating,
+        nationalPhoneNumber: place.nationalPhoneNumber,
       };
 
-      placesService.getDetails(request, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          if (place.geometry && place.geometry.location && map) {
-            map.panTo(place.geometry.location);
-            // Marker creation removed to avoid forced pinning.
-            // Use searchPlaces if you want markers.
-          }
-          resolve(JSON.stringify(place, null, 2));
-        } else {
-          resolve(`Error getting place details: ${status}`);
-        }
-      });
-    });
+      if (result.location && map) {
+        map.panTo(result.location);
+      }
+
+      return JSON.stringify(result, null, 2);
+    } catch (error) {
+      return `Error getting place details: ${error.message}`;
+    }
   } else if (functionName === "getDirections") {
     if (!directionsService) return "Error: DirectionsService not initialized.";
 
