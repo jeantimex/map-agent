@@ -339,7 +339,8 @@ export async function executeMapCommand(
           filteredResults.forEach((place) => {
             if (place.geometry && place.geometry.location) {
               const pin = new google.maps.marker.PinElement({
-                background: place.icon_background_color,
+                background: place.icon_background_color || null,
+                borderColor: place.icon_background_color || null,
                 glyphSrc: place.icon_mask_base_uri
                   ? new URL(String(place.icon_mask_base_uri) + ".png")
                   : undefined,
@@ -379,7 +380,7 @@ export async function executeMapCommand(
 
           if (map && !args.biasTowardsMapCenter) {
             // Only adjust bounds if we didn't strictly bias to current view
-            map.fitBounds(bounds);
+            map.fitBounds(bounds, /* padding= */ 100);
           }
 
           const summary = filteredResults

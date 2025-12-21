@@ -36,6 +36,7 @@ export async function initMapService() {
       streetViewControl: true,
       tiltInteractionEnabled: true,
       headingInteractionEnabled: true,
+      gestureHandling: "greedy",
       mapId: "DEMO_MAP_ID",
     });
 
