@@ -54,7 +54,8 @@ export const placesTools = [
   },
   {
     name: "getPlaceDetailsByLocation",
-    description: "Get detailed information about a specific place by its name or address (e.g., 'White House', 'Eiffel Tower'). This tool will find the place, add a marker, and show its details in the side panel.",
+    description:
+      "Get detailed information about a specific place by its name or address (e.g., 'White House', 'Eiffel Tower'). This tool will find the place, add a marker, and show its details in the side panel.",
     parameters: {
       type: "OBJECT",
       properties: {

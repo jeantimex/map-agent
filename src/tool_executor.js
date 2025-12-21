@@ -354,8 +354,10 @@ export async function executeMapCommand(
                 if (map && place.geometry && place.geometry.location) {
                   const currentBounds = map.getBounds();
                   const currentZoom = map.getZoom();
-                  const isInBounds = currentBounds && currentBounds.contains(place.geometry.location);
-                  
+                  const isInBounds =
+                    currentBounds &&
+                    currentBounds.contains(place.geometry.location);
+
                   if (!(isInBounds && currentZoom >= 15)) {
                     map.setCenter(place.geometry.location);
                     map.setZoom(15);
@@ -410,60 +412,68 @@ export async function executeMapCommand(
       }
 
       placesService.textSearch(request, (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+        if (
+          status === google.maps.places.PlacesServiceStatus.OK &&
+          results &&
+          results.length > 0
+        ) {
           const place = results[0];
-          
+
           // Clear old markers
           clearPlacesMarkers();
 
           // Update Side Panel with this single result (so back button works)
           updatePlacesPanel([place], map);
-          
+
           // Show details immediately
           showPlaceDetails(place);
 
           // Add marker
           if (place.geometry && place.geometry.location) {
-              const pin = new google.maps.marker.PinElement({
-                background: place.icon_background_color || null,
-                borderColor: place.icon_background_color || null,
-                glyphSrc: place.icon_mask_base_uri
-                  ? new URL(String(place.icon_mask_base_uri) + ".png")
-                  : undefined,
-              });
-              const marker = new google.maps.marker.AdvancedMarkerElement({
-                map: map,
-                position: place.geometry.location,
-                title: place.name,
-                gmpClickable: true,
-              });
-              marker.append(pin);
+            const pin = new google.maps.marker.PinElement({
+              background: place.icon_background_color || null,
+              borderColor: place.icon_background_color || null,
+              glyphSrc: place.icon_mask_base_uri
+                ? new URL(String(place.icon_mask_base_uri) + ".png")
+                : undefined,
+            });
+            const marker = new google.maps.marker.AdvancedMarkerElement({
+              map: map,
+              position: place.geometry.location,
+              title: place.name,
+              gmpClickable: true,
+            });
+            marker.append(pin);
 
-              // Add click listener to marker
-              marker.addEventListener("gmp-click", () => {
-                if (map && place.geometry && place.geometry.location) {
-                  const currentBounds = map.getBounds();
-                  const currentZoom = map.getZoom();
-                  const isInBounds = currentBounds && currentBounds.contains(place.geometry.location);
-                  
-                  if (!(isInBounds && currentZoom >= 15)) {
-                    map.setCenter(place.geometry.location);
-                    map.setZoom(15);
-                  }
+            // Add click listener to marker
+            marker.addEventListener("gmp-click", () => {
+              if (map && place.geometry && place.geometry.location) {
+                const currentBounds = map.getBounds();
+                const currentZoom = map.getZoom();
+                const isInBounds =
+                  currentBounds &&
+                  currentBounds.contains(place.geometry.location);
+
+                if (!(isInBounds && currentZoom >= 15)) {
+                  map.setCenter(place.geometry.location);
+                  map.setZoom(15);
                 }
-                showPlaceDetails(place);
-              });
+              }
+              showPlaceDetails(place);
+            });
 
-              placesMarkers.push(marker);
-              
-              // Center map
-              map.setCenter(place.geometry.location);
-              map.setZoom(15);
+            placesMarkers.push(marker);
+
+            // Center map
+            map.setCenter(place.geometry.location);
+            map.setZoom(15);
           }
 
           resolve(JSON.stringify(place, null, 2));
         } else {
-          resolve(`Error finding place details for '${args.location}': ${status}`);
+          resolve(
+            `Error finding place details for '${args.location}': ${status}`
+          );
         }
       });
     });

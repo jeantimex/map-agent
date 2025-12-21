@@ -56,23 +56,23 @@ export function createSidePanel() {
 
     // Fit bounds to show all places again, but only if they are not already visible
     if (panel.placesData && panel.placesData.length > 0 && panel.mapInstance) {
-        const bounds = new google.maps.LatLngBounds();
-        const currentBounds = panel.mapInstance.getBounds();
-        let allInBounds = true;
+      const bounds = new google.maps.LatLngBounds();
+      const currentBounds = panel.mapInstance.getBounds();
+      let allInBounds = true;
 
-        panel.placesData.forEach(p => {
-            if (p.geometry && p.geometry.location) {
-                bounds.extend(p.geometry.location);
-                if (currentBounds && !currentBounds.contains(p.geometry.location)) {
-                    allInBounds = false;
-                }
-            }
-        });
-
-        // Only fit bounds if at least one place is outside or we don't have current bounds
-        if (!allInBounds || !currentBounds) {
-            panel.mapInstance.fitBounds(bounds, 100);
+      panel.placesData.forEach((p) => {
+        if (p.geometry && p.geometry.location) {
+          bounds.extend(p.geometry.location);
+          if (currentBounds && !currentBounds.contains(p.geometry.location)) {
+            allInBounds = false;
+          }
         }
+      });
+
+      // Only fit bounds if at least one place is outside or we don't have current bounds
+      if (!allInBounds || !currentBounds) {
+        panel.mapInstance.fitBounds(bounds, 100);
+      }
     }
   });
 
@@ -194,8 +194,9 @@ export function updatePlacesPanel(places, map) {
         if (map && place.geometry && place.geometry.location) {
           const currentBounds = map.getBounds();
           const currentZoom = map.getZoom();
-          const isInBounds = currentBounds && currentBounds.contains(place.geometry.location);
-          
+          const isInBounds =
+            currentBounds && currentBounds.contains(place.geometry.location);
+
           if (!(isInBounds && currentZoom >= 15)) {
             map.setCenter(place.geometry.location);
             map.setZoom(15);

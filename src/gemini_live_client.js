@@ -1,6 +1,7 @@
 import { executeMapCommand } from "./tool_executor.js";
 import { mapNavigationTools } from "./map_navigation_tools.js";
 import { placesTools } from "./places_tools.js";
+import { addMessage } from "./chat_interface.js";
 
 export class GeminiLiveClient {
   constructor({ mapState, onActiveChange }) {
@@ -123,6 +124,9 @@ export class GeminiLiveClient {
           // Decode Base64 audio and play
           const audioData = this.base64ToArrayBuffer(part.inlineData.data);
           this.playAudioChunk(audioData);
+        }
+        if (part.text) {
+          addMessage(part.text, false);
         }
       }
     }
