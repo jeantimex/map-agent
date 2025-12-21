@@ -50,44 +50,88 @@ export function createSidePanel() {
     title.textContent = "Places Found";
     count.style.display = "inline-block";
     toggleBtn.textContent = "▼";
-    
+
     // Update state
     activeView = list;
 
     // Fit bounds to show all places again
     if (panel.placesData && panel.placesData.length > 0 && panel.mapInstance) {
-        const bounds = new google.maps.LatLngBounds();
-        panel.placesData.forEach(p => {
-            if (p.geometry && p.geometry.location) {
-                bounds.extend(p.geometry.location);
-            }
-        });
-        panel.mapInstance.fitBounds(bounds, 100);
+      const bounds = new google.maps.LatLngBounds();
+      panel.placesData.forEach((p) => {
+        if (p.geometry && p.geometry.location) {
+          bounds.extend(p.geometry.location);
+        }
+      });
+      panel.mapInstance.fitBounds(bounds, 100);
     }
   });
-  
+
   // ... (inside updatePlacesPanel) ...
-  
+
   // Let's attach the state to the panel element for simplicity in this refactor
   panel.setActiveView = (viewName) => {
-      if (viewName === 'details') {
-          activeView = details;
-      }
-      else {
-          activeView = list;
-      }
+    if (viewName === "details") {
+      activeView = details;
+    } else {
+      activeView = list;
+    }
   };
 
   return panel;
 }
 
+export function showPlaceDetails(place) {
+  const panel = document.getElementById("places-panel");
+  const list = document.getElementById("places-list");
+  const details = document.getElementById("place-details");
+  const backBtn = document.getElementById("back-to-list");
+  const title = document.getElementById("panel-title");
+  const countBadge = document.getElementById("places-count");
+
+  // Ensure panel is visible
+  if (panel) panel.style.display = "flex";
+
+  if (list) list.style.display = "none";
+  if (details) details.style.display = "block";
+  if (backBtn) backBtn.style.display = "flex";
+  if (title) title.textContent = place.name;
+  if (countBadge) countBadge.style.display = "none";
+
+  // Update active view state (hacky access to panel property we set in createSidePanel)
+  if (panel && panel.setActiveView) panel.setActiveView("details");
+
+  if (details) {
+    details.innerHTML = `
+      <gmp-place-details>
+        <gmp-place-details-place-request place="${place.place_id}"></gmp-place-details-place-request>
+        <gmp-place-content-config>
+          <gmp-place-address></gmp-place-address>
+          <gmp-place-rating></gmp-place-rating>
+          <gmp-place-type></gmp-place-type>
+          <gmp-place-price></gmp-place-price>
+          <gmp-place-accessible-entrance-icon></gmp-place-accessible-entrance-icon>
+          <gmp-place-opening-hours></gmp-place-opening-hours>
+          <gmp-place-website></gmp-place-website>
+          <gmp-place-phone-number></gmp-place-phone-number>
+          <gmp-place-summary></gmp-place-summary>
+          <gmp-place-type-specific-highlights></gmp-place-type-specific-highlights>
+          <gmp-place-reviews></gmp-place-reviews>
+          <gmp-place-feature-list></gmp-place-feature-list>
+          <gmp-place-media lightbox-preferred></gmp-place-media>
+          <gmp-place-attribution light-scheme-color="gray" dark-scheme-color="white"></gmp-place-attribution>
+        </gmp-place-content-config>
+      </gmp-place-details>
+    `;
+  }
+}
+
 export function updatePlacesPanel(places, map) {
   const panel = document.getElementById("places-panel");
-  
+
   // Store data for back button functionality
   if (panel) {
-      panel.placesData = places;
-      panel.mapInstance = map;
+    panel.placesData = places;
+    panel.mapInstance = map;
   }
 
   const list = document.getElementById("places-list");
@@ -149,38 +193,5 @@ export function updatePlacesPanel(places, map) {
   } else {
     panel.style.display = "none";
     if (countBadge) countBadge.style.display = "none";
-  }
-
-  function showPlaceDetails(place) {
-    list.style.display = "none";
-    details.style.display = "block";
-    backBtn.style.display = "flex";
-    title.textContent = place.name;
-    if (countBadge) countBadge.style.display = "none";
-    
-    // Update active view state
-    if (panel.setActiveView) panel.setActiveView('details');
-
-    details.innerHTML = `
-      <gmp-place-details>
-        <gmp-place-details-place-request place="${place.place_id}"></gmp-place-details-place-request>
-        <gmp-place-content-config>
-          <gmp-place-address></gmp-place-address>
-          <gmp-place-rating></gmp-place-rating>
-          <gmp-place-type></gmp-place-type>
-          <gmp-place-price></gmp-place-price>
-          <gmp-place-accessible-entrance-icon></gmp-place-accessible-entrance-icon>
-          <gmp-place-opening-hours></gmp-place-opening-hours>
-          <gmp-place-website></gmp-place-website>
-          <gmp-place-phone-number></gmp-place-phone-number>
-          <gmp-place-summary></gmp-place-summary>
-          <gmp-place-type-specific-highlights></gmp-place-type-specific-highlights>
-          <gmp-place-reviews></gmp-place-reviews>
-          <gmp-place-feature-list></gmp-place-feature-list>
-          <gmp-place-media lightbox-preferred></gmp-place-media>
-          <gmp-place-attribution light-scheme-color="gray" dark-scheme-color="white"></gmp-place-attribution>
-        </gmp-place-content-config>
-      </gmp-place-details>
-    `;
   }
 }
