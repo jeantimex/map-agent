@@ -298,11 +298,14 @@ export async function executeMapCommand(
         query: args.query,
         fields: [
           "name",
+          "display_name",
           "geometry",
           "formatted_address",
           "place_id",
           "rating",
           "photos",
+          "icon_mask_base_uri",
+          "icon_background_color",
         ],
       };
 
@@ -335,7 +338,12 @@ export async function executeMapCommand(
           const bounds = new google.maps.LatLngBounds();
           filteredResults.forEach((place) => {
             if (place.geometry && place.geometry.location) {
-              const pin = new google.maps.marker.PinElement({});
+              const pin = new google.maps.marker.PinElement({
+                background: place.icon_background_color,
+                glyphSrc: place.icon_mask_base_uri
+                  ? new URL(String(place.icon_mask_base_uri) + ".png")
+                  : undefined,
+              });
               const marker = new google.maps.marker.AdvancedMarkerElement({
                 map: map,
                 position: place.geometry.location,
