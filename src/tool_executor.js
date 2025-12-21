@@ -400,6 +400,14 @@ export async function executeMapCommand(
               showPlaceDetails(place);
             });
 
+            marker.element.addEventListener("mouseenter", () => {
+              markerCallbacks.onMouseEnter(place.place_id);
+            });
+
+            marker.element.addEventListener("mouseleave", () => {
+              markerCallbacks.onMouseLeave(place.place_id);
+            });
+
             placesMarkers.push(marker);
             bounds.extend(place.geometry.location);
           }
@@ -457,30 +465,45 @@ export async function executeMapCommand(
           icon_background_color: p.iconBackgroundColor,
         };
 
-        // Clear old markers
-        clearPlacesMarkers();
+        const existingMarker = placesMarkers.find(
+          (m) => m.element.id === `place_marker${place.place_id}`
+        );
+
+        if (existingMarker) {
+          if (map && place.geometry && place.geometry.location) {
+            map.setCenter(place.geometry.location);
+            map.setZoom(15);
+          }
+          showPlaceDetails(place);
+          return JSON.stringify(place, null, 2);
+        }
 
         // Update Side Panel with this single result (so back button works)
         updatePlacesPanel([place], map, markerCallbacks);
 
         // Show details immediately
+        showPlaceDetails(place);
+
+        // Add marker
         if (place.geometry && place.geometry.location) {
           const pin = new google.maps.marker.PinElement({
             background: place.icon_background_color || null,
             borderColor: place.icon_background_color || null,
             glyphSrc: place.icon_mask_base_uri
-              ? new URL(String(place.icon_mask_base_uri))
+              ? new URL(String(place.icon_mask_base_uri) + ".png")
               : undefined,
           });
-                        const marker = new google.maps.marker.AdvancedMarkerElement({
-                          map: map,
-                          position: place.geometry.location,
-                          title: place.name,
-                          gmpClickable: true,
-                        });
-                                  marker.element.id = `place_marker${place.place_id}`;
-                                  marker.originalColor = place.icon_background_color;
-                                  marker.append(pin);          // Add click listener to marker
+          const marker = new google.maps.marker.AdvancedMarkerElement({
+            map: map,
+            position: place.geometry.location,
+            title: place.name,
+            gmpClickable: true,
+          });
+          marker.element.id = `place_marker${place.place_id}`;
+          marker.originalColor = place.icon_background_color;
+          marker.append(pin);
+
+          // Add click listener to marker
           marker.addEventListener("gmp-click", () => {
             if (map && place.geometry && place.geometry.location) {
               const currentBounds = map.getBounds();
@@ -495,6 +518,14 @@ export async function executeMapCommand(
               }
             }
             showPlaceDetails(place);
+          });
+
+          marker.element.addEventListener("mouseenter", () => {
+            markerCallbacks.onMouseEnter(place.place_id);
+          });
+
+          marker.element.addEventListener("mouseleave", () => {
+            markerCallbacks.onMouseLeave(place.place_id);
           });
 
           placesMarkers.push(marker);
