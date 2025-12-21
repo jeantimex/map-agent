@@ -73,6 +73,29 @@ function clearPlacesMarkers() {
   updatePlacesPanel([]);
 }
 
+const markerCallbacks = {
+  onMouseEnter: (placeId) => {
+    const marker = placesMarkers.find(
+      (m) => m.element.id === `place_marker${placeId}`
+    );
+    if (marker && marker.content) {
+      marker.content.background = null;
+      marker.content.borderColor = null;
+      marker.content.glyphColor = "white";
+    }
+  },
+  onMouseLeave: (placeId) => {
+    const marker = placesMarkers.find(
+      (m) => m.element.id === `place_marker${placeId}`
+    );
+    if (marker && marker.content) {
+      marker.content.background = marker.originalColor;
+      marker.content.borderColor = marker.originalColor;
+      marker.content.glyphColor = null;
+    }
+  },
+};
+
 export async function executeMapCommand(
   functionName,
   args,
@@ -338,7 +361,7 @@ export async function executeMapCommand(
         clearPlacesMarkers();
 
         // Update Side Panel
-        updatePlacesPanel(adaptedResults, map);
+        updatePlacesPanel(adaptedResults, map, markerCallbacks);
 
         // Add new markers
         const bounds = new google.maps.LatLngBounds();
@@ -351,14 +374,15 @@ export async function executeMapCommand(
                 ? new URL(String(place.icon_mask_base_uri))
                 : undefined,
             });
-            const marker = new google.maps.marker.AdvancedMarkerElement({
-              map: map,
-              position: place.geometry.location,
-              title: place.name,
-              gmpClickable: true,
-            });
-            marker.append(pin);
-
+                          const marker = new google.maps.marker.AdvancedMarkerElement({
+                            map: map,
+                            position: place.geometry.location,
+                            title: place.name,
+                            gmpClickable: true,
+                          });
+                          marker.element.id = `place_marker${place.place_id}`;
+                          marker.originalColor = place.icon_background_color;
+                          marker.append(pin);
             // Add click listener to marker to show details in side panel
             marker.addEventListener("gmp-click", () => {
               if (map && place.geometry && place.geometry.location) {
@@ -437,9 +461,9 @@ export async function executeMapCommand(
         clearPlacesMarkers();
 
         // Update Side Panel with this single result (so back button works)
-        updatePlacesPanel([place], map);
+        updatePlacesPanel([place], map, markerCallbacks);
 
-        // Add marker
+        // Show details immediately
         if (place.geometry && place.geometry.location) {
           const pin = new google.maps.marker.PinElement({
             background: place.icon_background_color || null,
@@ -448,15 +472,15 @@ export async function executeMapCommand(
               ? new URL(String(place.icon_mask_base_uri))
               : undefined,
           });
-          const marker = new google.maps.marker.AdvancedMarkerElement({
-            map: map,
-            position: place.geometry.location,
-            title: place.name,
-            gmpClickable: true,
-          });
-          marker.append(pin);
-
-          // Add click listener to marker
+                        const marker = new google.maps.marker.AdvancedMarkerElement({
+                          map: map,
+                          position: place.geometry.location,
+                          title: place.name,
+                          gmpClickable: true,
+                        });
+                                  marker.element.id = `place_marker${place.place_id}`;
+                                  marker.originalColor = place.icon_background_color;
+                                  marker.append(pin);          // Add click listener to marker
           marker.addEventListener("gmp-click", () => {
             if (map && place.geometry && place.geometry.location) {
               const currentBounds = map.getBounds();

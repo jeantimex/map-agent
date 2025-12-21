@@ -135,7 +135,7 @@ export function showPlaceDetails(place) {
   }
 }
 
-export function updatePlacesPanel(places, map) {
+export function updatePlacesPanel(places, map, callbacks = {}) {
   const panel = document.getElementById("places-panel");
 
   // Store data for back button functionality
@@ -174,6 +174,7 @@ export function updatePlacesPanel(places, map) {
     places.forEach((place) => {
       const item = document.createElement("div");
       item.className = "place-item";
+      item.id = `place_card${place.place_id}`;
       item.innerHTML = `
         <gmp-place-details-compact orientation="horizontal" truncation-preferred slot="control-block-start-inline-center">
           <gmp-place-details-place-request place="${place.place_id}"></gmp-place-details-place-request>
@@ -188,6 +189,18 @@ export function updatePlacesPanel(places, map) {
           </gmp-place-content-config>
         </gmp-place-details-compact>
       `;
+
+      if (callbacks.onMouseEnter) {
+        item.addEventListener("mouseenter", () => {
+          callbacks.onMouseEnter(place.place_id);
+        });
+      }
+
+      if (callbacks.onMouseLeave) {
+        item.addEventListener("mouseleave", () => {
+          callbacks.onMouseLeave(place.place_id);
+        });
+      }
 
       item.addEventListener("click", () => {
         // Center and zoom map on click, but only if not already visible at sufficient zoom
