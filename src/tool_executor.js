@@ -349,6 +349,21 @@ export async function executeMapCommand(
               });
               marker.append(pin);
 
+              // Add click listener to marker to show details in side panel
+              marker.addEventListener("gmp-click", () => {
+                if (map && place.geometry && place.geometry.location) {
+                  const currentBounds = map.getBounds();
+                  const currentZoom = map.getZoom();
+                  const isInBounds = currentBounds && currentBounds.contains(place.geometry.location);
+                  
+                  if (!(isInBounds && currentZoom >= 15)) {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(15);
+                  }
+                }
+                showPlaceDetails(place);
+              });
+
               placesMarkers.push(marker);
               bounds.extend(place.geometry.location);
             }
@@ -423,6 +438,22 @@ export async function executeMapCommand(
                 gmpClickable: true,
               });
               marker.append(pin);
+
+              // Add click listener to marker
+              marker.addEventListener("gmp-click", () => {
+                if (map && place.geometry && place.geometry.location) {
+                  const currentBounds = map.getBounds();
+                  const currentZoom = map.getZoom();
+                  const isInBounds = currentBounds && currentBounds.contains(place.geometry.location);
+                  
+                  if (!(isInBounds && currentZoom >= 15)) {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(15);
+                  }
+                }
+                showPlaceDetails(place);
+              });
+
               placesMarkers.push(marker);
               
               // Center map
