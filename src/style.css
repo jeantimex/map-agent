@@ -306,32 +306,51 @@ gmp-place-details-compact {
 }
 
 #places-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
 }
 
-#places-list li {
+/* Custom Scrollbar for Places List */
+#places-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+#places-list::-webkit-scrollbar-track {
+  background: #f1f3f4;
+}
+
+#places-list::-webkit-scrollbar-thumb {
+  background: #dadce0;
+  border-radius: 4px;
+}
+
+#places-list::-webkit-scrollbar-thumb:hover {
+  background: #bdc1c6;
+}
+
+.place-item {
   padding: 0;
   border-bottom: 1px solid #f1f3f4;
   font-size: 14px;
-  cursor: default;
+  cursor: pointer;
   transition: background-color 0.2s;
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
-#places-list li:last-child {
+.place-item:last-child {
   border-bottom: none;
 }
 
-#places-list li:hover {
+.place-item:hover,
+.place-item:hover gmp-place-details-compact {
   background-color: #f1f3f4;
 }
 
 /* Ensure component fits */
-#places-list gmp-place-details-compact {
+.place-item gmp-place-details-compact {
   width: 100%;
   min-width: unset; /* Override default min-width to fit container if needed */
   border: none;

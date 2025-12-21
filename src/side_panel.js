@@ -6,7 +6,7 @@ export function createSidePanel() {
       <span>Places Found</span>
       <button id="toggle-panel">▼</button>
     </div>
-    <ul id="places-list"></ul>
+    <div id="places-list"></div>
   `;
 
   // Initially hidden
@@ -18,7 +18,7 @@ export function createSidePanel() {
 
   toggleBtn.addEventListener("click", () => {
     if (list.style.display === "none") {
-      list.style.display = "block";
+      list.style.display = "flex";
       toggleBtn.textContent = "▼";
     } else {
       list.style.display = "none";
@@ -36,12 +36,13 @@ export function updatePlacesPanel(places) {
   if (!panel || !list) return;
 
   if (places && places.length > 0) {
-    panel.style.display = "block";
+    panel.style.display = "flex";
     list.innerHTML = "";
 
     places.forEach((place) => {
-      const li = document.createElement("li");
-      li.innerHTML = `
+      const item = document.createElement("div");
+      item.className = "place-item";
+      item.innerHTML = `
         <gmp-place-details-compact orientation="horizontal" truncation-preferred slot="control-block-start-inline-center">
           <gmp-place-details-place-request place="${place.place_id}"></gmp-place-details-place-request>
           <gmp-place-content-config>
@@ -57,8 +58,8 @@ export function updatePlacesPanel(places) {
       `;
 
       // Store place ID for potential future interactivity
-      li.dataset.placeId = place.place_id;
-      list.appendChild(li);
+      item.dataset.placeId = place.place_id;
+      list.appendChild(item);
     });
   } else {
     panel.style.display = "none";
