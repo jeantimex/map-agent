@@ -4,6 +4,7 @@ import { initChatInterface, addMessage } from "./chat_interface.js";
 import { executeMapCommand } from "./tool_executor.js";
 import { createLiveControl } from "./live_control.js";
 import { GeminiLiveClient } from "./gemini_live_client.js";
+import { createSidePanel } from "./side_panel.js";
 import "./style.css";
 
 // Global state
@@ -112,6 +113,10 @@ async function initializeApp() {
     mapState.map.controls[
       google.maps.ControlPosition.INLINE_END_BLOCK_END
     ].push(liveControl);
+
+    // Create Side Panel
+    const sidePanel = createSidePanel();
+    document.querySelector(".app-container").appendChild(sidePanel);
 
     addMessage(
       "Hello! I'm your AI Map Agent. I can move the map, zoom, search for places, and give directions. Try saying 'Go to Paris' or 'Find pizza nearby'."

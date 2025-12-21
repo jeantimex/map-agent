@@ -1,3 +1,5 @@
+import { updatePlacesPanel } from "./side_panel.js";
+
 /**
  * Helper to update panorama position if it's currently visible/linked.
  */
@@ -64,15 +66,11 @@ function simulateDrag(element, startX, startY, endX, endY, duration = 500) {
 let directionsRenderer = null;
 // Global markers array to clear previous search results
 let placesMarkers = [];
-// Global info window for places
-let placesInfoWindow = null;
 
 function clearPlacesMarkers() {
   placesMarkers.forEach((m) => m.setMap(null));
   placesMarkers = [];
-  if (placesInfoWindow) {
-    placesInfoWindow.close();
-  }
+  updatePlacesPanel([]);
 }
 
 export async function executeMapCommand(
@@ -288,11 +286,6 @@ export async function executeMapCommand(
   else if (functionName === "searchPlaces") {
     if (!placesService) return "Error: PlacesService not initialized.";
 
-    // Initialize InfoWindow if needed
-    if (!placesInfoWindow) {
-      placesInfoWindow = new google.maps.InfoWindow();
-    }
-
     return new Promise((resolve) => {
       const request = {
         query: args.query,
@@ -334,6 +327,9 @@ export async function executeMapCommand(
           // Clear old markers
           clearPlacesMarkers();
 
+          // Update Side Panel
+          updatePlacesPanel(filteredResults);
+
           // Add new markers
           const bounds = new google.maps.LatLngBounds();
           filteredResults.forEach((place) => {
@@ -352,26 +348,6 @@ export async function executeMapCommand(
                 gmpClickable: true,
               });
               marker.append(pin);
-
-              // Add click listener for InfoWindow
-              marker.addEventListener("gmp-click", () => {
-                const content = `
-                                <gmp-place-details-compact orientation="horizontal" truncation-preferred slot="control-block-start-inline-center">
-                                  <gmp-place-details-place-request place="${place.place_id}"></gmp-place-details-place-request>
-                                  <gmp-place-content-config>
-                                      <gmp-place-media lightbox-preferred></gmp-place-media>
-                                      <gmp-place-rating></gmp-place-rating>
-                                      <gmp-place-type></gmp-place-type>
-                                      <gmp-place-price></gmp-place-price>
-                                      <gmp-place-accessible-entrance-icon></gmp-place-accessible-entrance-icon>
-                                      <gmp-place-open-now-status></gmp-place-open-now-status>
-                                      <gmp-place-attribution light-scheme-color="gray" dark-scheme-color="white"></gmp-place-attribution>
-                                  </gmp-place-content-config>
-                                </gmp-place-details-compact>
-                            `;
-                placesInfoWindow.setContent(content);
-                placesInfoWindow.open(map, marker);
-              });
 
               placesMarkers.push(marker);
               bounds.extend(place.geometry.location);
