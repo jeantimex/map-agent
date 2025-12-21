@@ -41,7 +41,21 @@ export function updatePlacesPanel(places) {
 
     places.forEach((place) => {
       const li = document.createElement("li");
-      li.textContent = place.name;
+      li.innerHTML = `
+        <gmp-place-details-compact orientation="horizontal" truncation-preferred slot="control-block-start-inline-center">
+          <gmp-place-details-place-request place="${place.place_id}"></gmp-place-details-place-request>
+          <gmp-place-content-config>
+            <gmp-place-media lightbox-preferred></gmp-place-media>
+            <gmp-place-rating></gmp-place-rating>
+            <gmp-place-type></gmp-place-type>
+            <gmp-place-price></gmp-place-price>
+            <gmp-place-accessible-entrance-icon></gmp-place-accessible-entrance-icon>
+            <gmp-place-open-now-status></gmp-place-open-now-status>
+            <gmp-place-attribution light-scheme-color="gray" dark-scheme-color="white"></gmp-place-attribution>
+          </gmp-place-content-config>
+        </gmp-place-details-compact>
+      `;
+
       // Store place ID for potential future interactivity
       li.dataset.placeId = place.place_id;
       list.appendChild(li);

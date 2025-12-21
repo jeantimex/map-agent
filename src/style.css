@@ -274,7 +274,7 @@ gmp-place-details-compact {
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 300px;
+  width: 450px;
   background-color: var(--chat-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -283,7 +283,7 @@ gmp-place-details-compact {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  max-height: 80vh;
+  max-height: calc(100vh - 40px);
 }
 
 .panel-header {
@@ -310,13 +310,15 @@ gmp-place-details-compact {
   margin: 0;
   padding: 0;
   overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 #places-list li {
-  padding: 10px 15px;
+  padding: 0;
   border-bottom: 1px solid #f1f3f4;
   font-size: 14px;
-  cursor: pointer;
+  cursor: default;
   transition: background-color 0.2s;
 }
 
@@ -326,4 +328,12 @@ gmp-place-details-compact {
 
 #places-list li:hover {
   background-color: #f1f3f4;
+}
+
+/* Ensure component fits */
+#places-list gmp-place-details-compact {
+  width: 100%;
+  min-width: unset; /* Override default min-width to fit container if needed */
+  border: none;
+  box-shadow: none;
 }
