@@ -60,6 +60,10 @@ export async function initMapService() {
       document.querySelector(".chat-container").classList.remove("open");
     });
 
+    map.addListener("center_changed", () => {
+      panorama.setPosition(map.getCenter());
+    });
+
     return {
       map,
       geocoder,
