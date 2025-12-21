@@ -96,6 +96,68 @@ const markerCallbacks = {
   },
 };
 
+function adaptPlaceResult(p) {
+  return {
+    place_id: p.id,
+    name: p.displayName,
+    formatted_address: p.formattedAddress,
+    geometry: { location: p.location },
+    rating: p.rating,
+    photos: p.photos,
+    icon_mask_base_uri: p.svgIconMaskURI,
+    icon_background_color: p.iconBackgroundColor,
+  };
+}
+
+function createAndAddMarker(place, map, markerCallbacks) {
+  if (!place.geometry || !place.geometry.location) return null;
+
+  const pin = new google.maps.marker.PinElement({
+    background: place.icon_background_color || null,
+    borderColor: place.icon_background_color || null,
+    glyphSrc: place.icon_mask_base_uri
+      ? new URL(String(place.icon_mask_base_uri))
+      : undefined,
+  });
+
+  const marker = new google.maps.marker.AdvancedMarkerElement({
+    map: map,
+    position: place.geometry.location,
+    title: place.name,
+    gmpClickable: true,
+  });
+
+  marker.element.id = `place_marker${place.place_id}`;
+  marker.originalColor = place.icon_background_color;
+  marker.append(pin);
+
+  marker.addEventListener("gmp-click", () => {
+    if (map && place.geometry && place.geometry.location) {
+      const currentBounds = map.getBounds();
+      const currentZoom = map.getZoom();
+      const isInBounds =
+        currentBounds && currentBounds.contains(place.geometry.location);
+
+      if (!(isInBounds && currentZoom >= 15)) {
+        map.setCenter(place.geometry.location);
+        map.setZoom(15);
+      }
+    }
+    showPlaceDetails(place);
+  });
+
+  marker.element.addEventListener("mouseenter", () => {
+    markerCallbacks.onMouseEnter(place.place_id);
+  });
+
+  marker.element.addEventListener("mouseleave", () => {
+    markerCallbacks.onMouseLeave(place.place_id);
+  });
+
+  placesMarkers.push(marker);
+  return marker;
+}
+
 export async function executeMapCommand(
   functionName,
   args,
@@ -346,16 +408,7 @@ export async function executeMapCommand(
         }
 
         // Adapt new Place objects to the structure expected by downstream code
-        const adaptedResults = filteredResults.map((p) => ({
-          place_id: p.id,
-          name: p.displayName,
-          formatted_address: p.formattedAddress,
-          geometry: { location: p.location },
-          rating: p.rating,
-          photos: p.photos,
-          icon_mask_base_uri: p.svgIconMaskURI,
-          icon_background_color: p.iconBackgroundColor,
-        }));
+        const adaptedResults = filteredResults.map(adaptPlaceResult);
 
         // Clear old markers
         clearPlacesMarkers();
@@ -367,48 +420,7 @@ export async function executeMapCommand(
         const bounds = new google.maps.LatLngBounds();
         adaptedResults.forEach((place) => {
           if (place.geometry && place.geometry.location) {
-            const pin = new google.maps.marker.PinElement({
-              background: place.icon_background_color || null,
-              borderColor: place.icon_background_color || null,
-              glyphSrc: place.icon_mask_base_uri
-                ? new URL(String(place.icon_mask_base_uri))
-                : undefined,
-            });
-            const marker = new google.maps.marker.AdvancedMarkerElement({
-              map: map,
-              position: place.geometry.location,
-              title: place.name,
-              gmpClickable: true,
-            });
-            marker.element.id = `place_marker${place.place_id}`;
-            marker.originalColor = place.icon_background_color;
-            marker.append(pin);
-            // Add click listener to marker to show details in side panel
-            marker.addEventListener("gmp-click", () => {
-              if (map && place.geometry && place.geometry.location) {
-                const currentBounds = map.getBounds();
-                const currentZoom = map.getZoom();
-                const isInBounds =
-                  currentBounds &&
-                  currentBounds.contains(place.geometry.location);
-
-                if (!(isInBounds && currentZoom >= 15)) {
-                  map.setCenter(place.geometry.location);
-                  map.setZoom(15);
-                }
-              }
-              showPlaceDetails(place);
-            });
-
-            marker.element.addEventListener("mouseenter", () => {
-              markerCallbacks.onMouseEnter(place.place_id);
-            });
-
-            marker.element.addEventListener("mouseleave", () => {
-              markerCallbacks.onMouseLeave(place.place_id);
-            });
-
-            placesMarkers.push(marker);
+            createAndAddMarker(place, map, markerCallbacks);
             bounds.extend(place.geometry.location);
           }
         });
@@ -460,16 +472,7 @@ export async function executeMapCommand(
       const { places } = await google.maps.places.Place.searchNearby(request);
 
       if (places && places.length > 0) {
-        const adaptedResults = places.map((p) => ({
-          place_id: p.id,
-          name: p.displayName,
-          formatted_address: p.formattedAddress,
-          geometry: { location: p.location },
-          rating: p.rating,
-          photos: p.photos,
-          icon_mask_base_uri: p.svgIconMaskURI,
-          icon_background_color: p.iconBackgroundColor,
-        }));
+        const adaptedResults = places.map(adaptPlaceResult);
 
         clearPlacesMarkers();
         updatePlacesPanel(adaptedResults, map, markerCallbacks);
@@ -477,48 +480,7 @@ export async function executeMapCommand(
         const bounds = new google.maps.LatLngBounds();
         adaptedResults.forEach((place) => {
           if (place.geometry && place.geometry.location) {
-            const pin = new google.maps.marker.PinElement({
-              background: place.icon_background_color || null,
-              borderColor: place.icon_background_color || null,
-              glyphSrc: place.icon_mask_base_uri
-                ? new URL(String(place.icon_mask_base_uri))
-                : undefined,
-            });
-            const marker = new google.maps.marker.AdvancedMarkerElement({
-              map: map,
-              position: place.geometry.location,
-              title: place.name,
-              gmpClickable: true,
-            });
-            marker.element.id = `place_marker${place.place_id}`;
-            marker.originalColor = place.icon_background_color;
-            marker.append(pin);
-
-            marker.addEventListener("gmp-click", () => {
-              if (map && place.geometry && place.geometry.location) {
-                const currentBounds = map.getBounds();
-                const currentZoom = map.getZoom();
-                const isInBounds =
-                  currentBounds &&
-                  currentBounds.contains(place.geometry.location);
-
-                if (!(isInBounds && currentZoom >= 15)) {
-                  map.setCenter(place.geometry.location);
-                  map.setZoom(15);
-                }
-              }
-              showPlaceDetails(place);
-            });
-
-            marker.element.addEventListener("mouseenter", () => {
-              markerCallbacks.onMouseEnter(place.place_id);
-            });
-
-            marker.element.addEventListener("mouseleave", () => {
-              markerCallbacks.onMouseLeave(place.place_id);
-            });
-
-            placesMarkers.push(marker);
+            createAndAddMarker(place, map, markerCallbacks);
             bounds.extend(place.geometry.location);
           }
         });
@@ -563,16 +525,7 @@ export async function executeMapCommand(
 
       if (places && places.length > 0) {
         const p = places[0];
-        const place = {
-          place_id: p.id,
-          name: p.displayName,
-          formatted_address: p.formattedAddress,
-          geometry: { location: p.location },
-          rating: p.rating,
-          photos: p.photos,
-          icon_mask_base_uri: p.svgIconMaskURI,
-          icon_background_color: p.iconBackgroundColor,
-        };
+        const place = adaptPlaceResult(p);
 
         const existingMarker = placesMarkers.find(
           (m) => m.element.id === `place_marker${place.place_id}`
@@ -595,49 +548,7 @@ export async function executeMapCommand(
 
         // Add marker
         if (place.geometry && place.geometry.location) {
-          const pin = new google.maps.marker.PinElement({
-            background: place.icon_background_color || null,
-            borderColor: place.icon_background_color || null,
-            glyphSrc: place.icon_mask_base_uri
-              ? new URL(String(place.icon_mask_base_uri) + ".png")
-              : undefined,
-          });
-          const marker = new google.maps.marker.AdvancedMarkerElement({
-            map: map,
-            position: place.geometry.location,
-            title: place.name,
-            gmpClickable: true,
-          });
-          marker.element.id = `place_marker${place.place_id}`;
-          marker.originalColor = place.icon_background_color;
-          marker.append(pin);
-
-          // Add click listener to marker
-          marker.addEventListener("gmp-click", () => {
-            if (map && place.geometry && place.geometry.location) {
-              const currentBounds = map.getBounds();
-              const currentZoom = map.getZoom();
-              const isInBounds =
-                currentBounds &&
-                currentBounds.contains(place.geometry.location);
-
-              if (!(isInBounds && currentZoom >= 15)) {
-                map.setCenter(place.geometry.location);
-                map.setZoom(15);
-              }
-            }
-            showPlaceDetails(place);
-          });
-
-          marker.element.addEventListener("mouseenter", () => {
-            markerCallbacks.onMouseEnter(place.place_id);
-          });
-
-          marker.element.addEventListener("mouseleave", () => {
-            markerCallbacks.onMouseLeave(place.place_id);
-          });
-
-          placesMarkers.push(marker);
+          createAndAddMarker(place, map, markerCallbacks);
 
           // Center map
           map.setCenter(place.geometry.location);
