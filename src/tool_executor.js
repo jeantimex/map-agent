@@ -79,7 +79,6 @@ export async function executeMapCommand(
   map,
   geocoder,
   panorama,
-  placesService,
   directionsService,
   elevationService
 ) {
@@ -284,157 +283,72 @@ export async function executeMapCommand(
 
   // --- Places Tools ---
   else if (functionName === "searchPlaces") {
-    if (!placesService) return "Error: PlacesService not initialized.";
+    if (!google.maps.places) return "Error: Places library not loaded.";
 
-    return new Promise((resolve) => {
+    try {
       const request = {
-        query: args.query,
+        textQuery: args.query,
         fields: [
-          "name",
-          "display_name",
-          "geometry",
-          "formatted_address",
-          "place_id",
+          "id",
+          "displayName",
+          "formattedAddress",
+          "location",
           "rating",
           "photos",
-          "icon_mask_base_uri",
-          "icon_background_color",
+          "svgIconMaskURI",
+          "iconBackgroundColor",
         ],
       };
 
       if (args.biasTowardsMapCenter && map) {
-        request.location = map.getCenter();
-        if (args.radius) request.radius = args.radius;
+        request.locationBias = map.getCenter();
       }
 
-      placesService.textSearch(request, (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-          // Filter results based on maxResults and minResults
-          let filteredResults = results;
-          if (args.maxResults !== undefined) {
-            filteredResults = filteredResults.slice(0, args.maxResults);
-          }
+      const { places } = await google.maps.places.Place.searchByText(request);
 
-          if (
-            args.minResults !== undefined &&
-            filteredResults.length < args.minResults
-          ) {
-            console.warn(
-              `Only found ${filteredResults.length} results, which is less than the requested minimum of ${args.minResults}.`
-            );
-          }
-
-          // Clear old markers
-          clearPlacesMarkers();
-
-          // Update Side Panel
-          updatePlacesPanel(filteredResults, map);
-
-          // Add new markers
-          const bounds = new google.maps.LatLngBounds();
-          filteredResults.forEach((place) => {
-            if (place.geometry && place.geometry.location) {
-              const pin = new google.maps.marker.PinElement({
-                background: place.icon_background_color || null,
-                borderColor: place.icon_background_color || null,
-                glyphSrc: place.icon_mask_base_uri
-                  ? new URL(String(place.icon_mask_base_uri) + ".png")
-                  : undefined,
-              });
-              const marker = new google.maps.marker.AdvancedMarkerElement({
-                map: map,
-                position: place.geometry.location,
-                title: place.name,
-                gmpClickable: true,
-              });
-              marker.append(pin);
-
-              // Add click listener to marker to show details in side panel
-              marker.addEventListener("gmp-click", () => {
-                if (map && place.geometry && place.geometry.location) {
-                  const currentBounds = map.getBounds();
-                  const currentZoom = map.getZoom();
-                  const isInBounds =
-                    currentBounds &&
-                    currentBounds.contains(place.geometry.location);
-
-                  if (!(isInBounds && currentZoom >= 15)) {
-                    map.setCenter(place.geometry.location);
-                    map.setZoom(15);
-                  }
-                }
-                showPlaceDetails(place);
-              });
-
-              placesMarkers.push(marker);
-              bounds.extend(place.geometry.location);
-            }
-          });
-
-          if (map && !args.biasTowardsMapCenter) {
-            // Only adjust bounds if we didn't strictly bias to current view
-            map.fitBounds(bounds, /* padding= */ 100);
-          }
-
-          const summary = filteredResults
-            .map((p) => `${p.name} (${p.rating}★) - ${p.formatted_address}`)
-            .join("\n");
-          resolve(
-            `Found ${filteredResults.length} places. Results:\n${summary}`
-          );
-        } else {
-          resolve(`No places found or error: ${status}`);
+      if (places && places.length > 0) {
+        // Filter results based on maxResults and minResults
+        let filteredResults = places;
+        if (args.maxResults !== undefined) {
+          filteredResults = filteredResults.slice(0, args.maxResults);
         }
-      });
-    });
-  } else if (functionName === "getPlaceDetailsByLocation") {
-    if (!placesService) return "Error: PlacesService not initialized.";
 
-    return new Promise((resolve) => {
-      const request = {
-        query: args.location,
-        fields: [
-          "name",
-          "display_name",
-          "geometry",
-          "formatted_address",
-          "place_id",
-          "rating",
-          "photos",
-          "icon_mask_base_uri",
-          "icon_background_color",
-        ],
-      };
-
-      if (args.biasTowardsMapCenter && map) {
-        request.location = map.getCenter();
-        if (args.radius) request.radius = args.radius;
-      }
-
-      placesService.textSearch(request, (results, status) => {
         if (
-          status === google.maps.places.PlacesServiceStatus.OK &&
-          results &&
-          results.length > 0
+          args.minResults !== undefined &&
+          filteredResults.length < args.minResults
         ) {
-          const place = results[0];
+          console.warn(
+            `Only found ${filteredResults.length} results, which is less than the requested minimum of ${args.minResults}.`
+          );
+        }
 
-          // Clear old markers
-          clearPlacesMarkers();
+        // Adapt new Place objects to the structure expected by downstream code
+        const adaptedResults = filteredResults.map((p) => ({
+          place_id: p.id,
+          name: p.displayName,
+          formatted_address: p.formattedAddress,
+          geometry: { location: p.location },
+          rating: p.rating,
+          photos: p.photos,
+          icon_mask_base_uri: p.svgIconMaskURI,
+          icon_background_color: p.iconBackgroundColor,
+        }));
 
-          // Update Side Panel with this single result (so back button works)
-          updatePlacesPanel([place], map);
+        // Clear old markers
+        clearPlacesMarkers();
 
-          // Show details immediately
-          showPlaceDetails(place);
+        // Update Side Panel
+        updatePlacesPanel(adaptedResults, map);
 
-          // Add marker
+        // Add new markers
+        const bounds = new google.maps.LatLngBounds();
+        adaptedResults.forEach((place) => {
           if (place.geometry && place.geometry.location) {
             const pin = new google.maps.marker.PinElement({
               background: place.icon_background_color || null,
               borderColor: place.icon_background_color || null,
               glyphSrc: place.icon_mask_base_uri
-                ? new URL(String(place.icon_mask_base_uri) + ".png")
+                ? new URL(String(place.icon_mask_base_uri))
                 : undefined,
             });
             const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -445,7 +359,7 @@ export async function executeMapCommand(
             });
             marker.append(pin);
 
-            // Add click listener to marker
+            // Add click listener to marker to show details in side panel
             marker.addEventListener("gmp-click", () => {
               if (map && place.geometry && place.geometry.location) {
                 const currentBounds = map.getBounds();
@@ -463,20 +377,116 @@ export async function executeMapCommand(
             });
 
             placesMarkers.push(marker);
-
-            // Center map
-            map.setCenter(place.geometry.location);
-            map.setZoom(15);
+            bounds.extend(place.geometry.location);
           }
+        });
 
-          resolve(JSON.stringify(place, null, 2));
-        } else {
-          resolve(
-            `Error finding place details for '${args.location}': ${status}`
-          );
+        if (map && !args.biasTowardsMapCenter) {
+          // Only adjust bounds if we didn't strictly bias to current view
+          map.fitBounds(bounds, /* padding= */ 100);
         }
-      });
-    });
+
+        const summary = adaptedResults
+          .map((p) => `${p.name} (${p.rating}★) - ${p.formatted_address}`)
+          .join("\n");
+        return `Found ${adaptedResults.length} places. Results:\n${summary}`;
+      } else {
+        return "No places found.";
+      }
+    } catch (error) {
+      return `Error searching for places: ${error.message}`;
+    }
+  } else if (functionName === "getPlaceDetailsByLocation") {
+    if (!google.maps.places) return "Error: Places library not loaded.";
+
+    try {
+      const request = {
+        textQuery: args.location,
+        fields: [
+          "id",
+          "displayName",
+          "formattedAddress",
+          "location",
+          "rating",
+          "photos",
+          "svgIconMaskURI",
+          "iconBackgroundColor",
+        ],
+      };
+
+      if (args.biasTowardsMapCenter && map) {
+        request.locationBias = map.getCenter();
+      }
+
+      const { places } = await google.maps.places.Place.searchByText(request);
+
+      if (places && places.length > 0) {
+        const p = places[0];
+        const place = {
+          place_id: p.id,
+          name: p.displayName,
+          formatted_address: p.formattedAddress,
+          geometry: { location: p.location },
+          rating: p.rating,
+          photos: p.photos,
+          icon_mask_base_uri: p.svgIconMaskURI,
+          icon_background_color: p.iconBackgroundColor,
+        };
+
+        // Clear old markers
+        clearPlacesMarkers();
+
+        // Update Side Panel with this single result (so back button works)
+        updatePlacesPanel([place], map);
+
+        // Add marker
+        if (place.geometry && place.geometry.location) {
+          const pin = new google.maps.marker.PinElement({
+            background: place.icon_background_color || null,
+            borderColor: place.icon_background_color || null,
+            glyphSrc: place.icon_mask_base_uri
+              ? new URL(String(place.icon_mask_base_uri))
+              : undefined,
+          });
+          const marker = new google.maps.marker.AdvancedMarkerElement({
+            map: map,
+            position: place.geometry.location,
+            title: place.name,
+            gmpClickable: true,
+          });
+          marker.append(pin);
+
+          // Add click listener to marker
+          marker.addEventListener("gmp-click", () => {
+            if (map && place.geometry && place.geometry.location) {
+              const currentBounds = map.getBounds();
+              const currentZoom = map.getZoom();
+              const isInBounds =
+                currentBounds &&
+                currentBounds.contains(place.geometry.location);
+
+              if (!(isInBounds && currentZoom >= 15)) {
+                map.setCenter(place.geometry.location);
+                map.setZoom(15);
+              }
+            }
+            showPlaceDetails(place);
+          });
+
+          placesMarkers.push(marker);
+
+          // Center map
+          map.setCenter(place.geometry.location);
+          map.setZoom(15);
+        }
+
+        return JSON.stringify(place, null, 2);
+      } else {
+        return `Error finding place details for '${args.location}': No results found.`;
+      }
+    } catch (error) {
+      return `Error finding place details for '${args.location}': ${error.message}`;
+    }
   } else if (functionName === "getPlaceDetailsByPlaceId") {
     if (!google.maps.places) return "Error: Places library not loaded.";
 

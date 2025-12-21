@@ -149,7 +149,6 @@ export class GeminiLiveClient {
         this.mapState.map,
         this.mapState.geocoder,
         this.mapState.panorama,
-        this.mapState.placesService,
         this.mapState.directionsService,
         this.mapState.elevationService
       );

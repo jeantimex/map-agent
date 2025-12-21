@@ -40,9 +40,6 @@ export async function initMapService() {
       mapId: "DEMO_MAP_ID",
     });
 
-    // PlacesService requires the map instance
-    const placesService = new google.maps.places.PlacesService(map);
-
     const panorama = new StreetViewPanorama(document.getElementById("pano"), {
       position: sfCoords,
       visible: false,
@@ -72,7 +69,6 @@ export async function initMapService() {
       map,
       geocoder,
       panorama,
-      placesService,
       directionsService,
       elevationService,
     };

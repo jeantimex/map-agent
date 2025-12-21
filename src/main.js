@@ -12,7 +12,6 @@ let mapState = {
   map: null,
   geocoder: null,
   panorama: null,
-  placesService: null,
   directionsService: null,
   elevationService: null,
 };
@@ -40,7 +39,6 @@ async function handleSendMessage(message) {
           mapState.map,
           mapState.geocoder,
           mapState.panorama,
-          mapState.placesService,
           mapState.directionsService,
           mapState.elevationService
         );
