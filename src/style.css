@@ -266,7 +266,7 @@ body {
 }
 
 gmp-place-details-compact {
-  min-width: 400px;
+  min-width: 360px;
 }
 
 /* Side Panel for Places */
@@ -274,7 +274,7 @@ gmp-place-details-compact {
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 450px;
+  width: 360px;
   background-color: var(--chat-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -311,6 +311,17 @@ gmp-place-details-compact {
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+}
+
+#place-details {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  background-color: #fff;
+}
+
+#place-details gmp-place-details {
+  width: 100%;
 }
 
 /* Custom Scrollbar for Places List */
@@ -355,4 +366,9 @@ gmp-place-details-compact {
   min-width: unset; /* Override default min-width to fit container if needed */
   border: none;
   box-shadow: none;
+}
+
+gmp-place-details-compact,
+gmp-place-details {
+  border: none;
 }
