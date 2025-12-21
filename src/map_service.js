@@ -46,6 +46,39 @@ export async function initMapService() {
       pov: { heading: 0, pitch: 0 },
     });
 
+    panorama.addListener("status_changed", () => {
+      const status = panorama.getStatus();
+      const panoContainer = document.getElementById("pano");
+      let errorMsg = document.getElementById("pano-error");
+
+      if (status === "ZERO_RESULTS") {
+        if (!errorMsg) {
+          errorMsg = document.createElement("div");
+          errorMsg.id = "pano-error";
+          errorMsg.innerText =
+            "Streetview is not available for the current address";
+          Object.assign(errorMsg.style, {
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            zIndex: "10",
+            pointerEvents: "none",
+          });
+          panoContainer.appendChild(errorMsg);
+        }
+        errorMsg.style.display = "block";
+      } else if (status === "OK") {
+        if (errorMsg) {
+          errorMsg.style.display = "none";
+        }
+      }
+    });
+
     // Create the custom agent control
     const agentControl = createAgentControl(map);
     map.controls[google.maps.ControlPosition.INLINE_END_BLOCK_END].push(
@@ -62,6 +95,13 @@ export async function initMapService() {
       clearTimeout(centerDebounceTimer);
       centerDebounceTimer = setTimeout(() => {
         panorama.setPosition(map.getCenter());
+        if (
+          document
+            .getElementById("map-container")
+            .classList.contains("split-view")
+        ) {
+          panorama.setVisible(true);
+        }
       }, 500);
     });
 

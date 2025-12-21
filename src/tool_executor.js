@@ -374,15 +374,15 @@ export async function executeMapCommand(
                 ? new URL(String(place.icon_mask_base_uri))
                 : undefined,
             });
-                          const marker = new google.maps.marker.AdvancedMarkerElement({
-                            map: map,
-                            position: place.geometry.location,
-                            title: place.name,
-                            gmpClickable: true,
-                          });
-                          marker.element.id = `place_marker${place.place_id}`;
-                          marker.originalColor = place.icon_background_color;
-                          marker.append(pin);
+            const marker = new google.maps.marker.AdvancedMarkerElement({
+              map: map,
+              position: place.geometry.location,
+              title: place.name,
+              gmpClickable: true,
+            });
+            marker.element.id = `place_marker${place.place_id}`;
+            marker.originalColor = place.icon_background_color;
+            marker.append(pin);
             // Add click listener to marker to show details in side panel
             marker.addEventListener("gmp-click", () => {
               if (map && place.geometry && place.geometry.location) {
