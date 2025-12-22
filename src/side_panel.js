@@ -103,7 +103,7 @@ export function createSidePanel() {
   return panel;
 }
 
-export function showPlaceDetails(place) {
+export function showPlaceDetails(place, map) {
   const panel = document.getElementById("places-panel");
   const list = document.getElementById("places-list");
   const details = document.getElementById("place-details");
@@ -114,6 +114,12 @@ export function showPlaceDetails(place) {
 
   // Ensure panel is visible
   if (panel) panel.style.display = "flex";
+
+  if (map && place.geometry && place.geometry.location) {
+    map.setCenter(place.geometry.location);
+    map.setZoom(18);
+    map.setTilt(45);
+  }
 
   if (list) list.style.display = "none";
   if (details) details.style.display = "block";
@@ -238,7 +244,7 @@ export function updatePlacesPanel(places, map, callbacks = {}) {
             map.setZoom(15);
           }
         }
-        showPlaceDetails(place);
+        showPlaceDetails(place, map);
       });
 
       list.appendChild(item);

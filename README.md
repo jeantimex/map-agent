@@ -56,7 +56,7 @@ Provides localized weather data with visual representations:
 
 ### AI Integration
 
-- Text Chat: Uses Gemini 2.0 Flash for understanding intent and executing complex tool chains.
+- Text Chat: Uses Gemini 3.0 Flash for understanding intent and executing complex tool chains.
 - Gemini Multimodal Live: Enables low-latency, real-time voice conversations using WebSockets and AudioWorklets.
 - Function Calling: Mapping natural language to specific JavaScript functions for reliable map manipulation.
 

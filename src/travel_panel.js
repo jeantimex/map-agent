@@ -239,6 +239,12 @@ export function updateTravelPanel(
     content.innerHTML = "";
     title.textContent = place.name;
 
+    if (map && place.geometry && place.geometry.location) {
+      map.setCenter(place.geometry.location);
+      map.setZoom(18);
+      map.setTilt(45);
+    }
+
     content.innerHTML = `
       <gmp-place-details>
         <gmp-place-details-place-request place="${place.place_id}"></gmp-place-details-place-request>

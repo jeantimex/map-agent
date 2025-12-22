@@ -141,12 +141,13 @@ function createAndAddMarker(place, map, markerCallbacks) {
       const isInBounds =
         currentBounds && currentBounds.contains(place.geometry.location);
 
-      if (!(isInBounds && currentZoom >= 15)) {
+      if (!(isInBounds && currentZoom >= 18)) {
         map.setCenter(place.geometry.location);
-        map.setZoom(15);
+        map.setZoom(18);
+        map.setTilt(45);
       }
     }
-    showPlaceDetails(place);
+    showPlaceDetails(place, map);
   });
 
   marker.element.addEventListener("mouseenter", () => {
@@ -597,10 +598,11 @@ export async function executeMapCommand(
         if (existingMarker) {
           if (map && place.geometry && place.geometry.location) {
             map.setCenter(place.geometry.location);
-            map.setZoom(15);
+            map.setZoom(18);
+            map.setTilt(45);
           }
           closeAllPanels();
-          showPlaceDetails(place);
+          showPlaceDetails(place, map);
           return JSON.stringify(place, null, 2);
         }
 
@@ -609,7 +611,7 @@ export async function executeMapCommand(
         updatePlacesPanel([place], map, markerCallbacks);
 
         // Show details immediately
-        showPlaceDetails(place);
+        showPlaceDetails(place, map);
 
         // Add marker
         if (place.geometry && place.geometry.location) {
@@ -617,7 +619,8 @@ export async function executeMapCommand(
 
           // Center map
           map.setCenter(place.geometry.location);
-          map.setZoom(15);
+          map.setZoom(18);
+          map.setTilt(45);
         }
 
         return JSON.stringify(place, null, 2);
