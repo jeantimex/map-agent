@@ -30,7 +30,7 @@ Integrated with the New Places API to provide rich location data:
 
 ![Places Exploration](https://github.com/user-attachments/assets/0164fcde-82e6-4aff-8565-4c32ad489b90)
 
-![Place Details](https://github.com/user-attachments/assets/d3ab484c-02f6-498a-881b-4536c4927520)
+![Place Details](https://github.com/user-attachments/assets/a8bfded8-9067-4d09-961a-2e9e10bf0b97)
 
 ### Travel Planning Tools
 
@@ -40,6 +40,8 @@ A sophisticated system for generating and managing trip itineraries:
 - Day-by-Day Exploration: Navigate through a nested UI stack to see specific activities for each day.
 - Integrated Experience: Automatically centers the map on the destination and displays relevant weather information if travel dates are provided.
 
+![Travel Itinerary](https://github.com/user-attachments/assets/cf55969e-f095-4e6f-9cb3-8efee8e56d67)
+
 ### Weather Information Tools
 
 Provides localized weather data with visual representations:
@@ -47,6 +49,8 @@ Provides localized weather data with visual representations:
 - Current Conditions: Fetch real-time weather including temperature, humidity, wind speed, and UV index.
 - Daily Forecast: View multi-day forecasts with high and low temperature trends.
 - Data Visualization: Uses D3.js to render temperature range charts within the weather panel.
+
+![Weather Forecast](https://github.com/user-attachments/assets/e595aeb7-d928-47ca-8ce2-a790cbe9966b)
 
 ## Technical Implementation
 
