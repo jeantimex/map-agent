@@ -4,6 +4,17 @@ An interactive, AI-powered map application built with the Google Maps JavaScript
 
 https://github.com/user-attachments/assets/10af2250-070b-4705-a4dc-81d6c3641ece
 
+## Purpose and Vision
+
+The primary mission of the Google Maps AI Agent is to advance digital accessibility (a11y) by rethinking how users interact with complex geographical and information systems. By leveraging advanced generative AI, the project aims to lower the barrier to entry for users with diverse needs, particularly those who find traditional mouse-and-menu interfaces challenging.
+
+### Advancing Accessibility
+
+- **Natural Language Control**: Users can manipulate the map and query information using natural phrasing, eliminating the need to locate and interact with small, precise UI elements.
+- **Multimodal Interaction**: With real-time voice support (Gemini Live), the application provides a hands-free experience, allowing for a fully conversational exploration of the world.
+- **Cognitive Simplification**: The agent handles complex multi-step tasks—such as planning an itinerary or finding specific types of places nearby—reducing the cognitive load required to navigate through multiple menus or settings.
+- **Unified Information Access**: By centralizing search, transit, weather, and travel planning into a single conversational interface, the project provides a more predictable and accessible flow for retrieving diverse data points.
+
 ## Core Capabilities
 
 The application is structured around several specialized tool suites that the Gemini AI uses to fulfill user requests.

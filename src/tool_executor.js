@@ -300,7 +300,12 @@ export async function executeMapCommand(
     document.getElementById("map-container").classList.add("split-view");
 
     // Collapse all panels when entering Street View
-    const panels = ["places-panel", "weather-panel", "travel-panel"];
+    const panels = [
+      "places-panel",
+      "weather-panel",
+      "travel-panel",
+      "directions-panel",
+    ];
     panels.forEach((id) => {
       const panel = document.getElementById(id);
       if (panel && panel.collapse) {
