@@ -1,5 +1,8 @@
 import { updatePlacesPanel, showPlaceDetails } from "./side_panel.js";
 import { updateWeatherPanel, updateForecastPanel } from "./weather_panel.js";
+import { updateTravelPanel } from "./travel_panel.js";
+import { adaptPlaceResult } from "./places_utils.js";
+import { generateTravelItinerary } from "./gemini_service.js";
 
 /**
  * Helper to update panorama position if it's currently visible/linked.
@@ -100,19 +103,6 @@ const markerCallbacks = {
     }
   },
 };
-
-function adaptPlaceResult(p) {
-  return {
-    place_id: p.id,
-    name: p.displayName,
-    formatted_address: p.formattedAddress,
-    geometry: { location: p.location },
-    rating: p.rating,
-    photos: p.photos,
-    icon_mask_base_uri: p.svgIconMaskURI,
-    icon_background_color: p.iconBackgroundColor,
-  };
-}
 
 function createAndAddMarker(place, map, markerCallbacks) {
   if (!place.geometry || !place.geometry.location) return null;
@@ -788,6 +778,64 @@ export async function executeMapCommand(
     } catch (e) {
       console.error("Weather Fetch Exception:", e);
       return `Error fetching forecast: ${e.message}`;
+    }
+  } else if (functionName === "getTravelPlan") {
+    try {
+      const plan = await generateTravelItinerary(
+        args.destination,
+        args.days,
+        args.preferences
+      );
+
+      // Enrich plan with real place data
+      for (const day of plan.itinerary) {
+        const enrichedPlaces = [];
+        for (const placeName of day.places) {
+          const request = {
+            textQuery: `${placeName} in ${plan.destination}`,
+            fields: [
+              "id",
+              "displayName",
+              "formattedAddress",
+              "location",
+              "rating",
+              "photos",
+              "svgIconMaskURI",
+              "iconBackgroundColor",
+            ],
+          };
+          try {
+            const { places } = await google.maps.places.Place.searchByText(
+              request
+            );
+            if (places && places.length > 0) {
+              enrichedPlaces.push(adaptPlaceResult(places[0]));
+            }
+          } catch (e) {
+            console.warn(`Could not find place: ${placeName}`, e);
+          }
+        }
+        day.places = enrichedPlaces;
+      }
+
+      updateTravelPanel(plan, (selectedDay) => {
+        clearPlacesMarkers();
+        const bounds = new google.maps.LatLngBounds();
+        selectedDay.places.forEach((place) => {
+          createAndAddMarker(place, map, markerCallbacks);
+          if (place.geometry && place.geometry.location) {
+            bounds.extend(place.geometry.location);
+          }
+        });
+        if (map && selectedDay.places.length > 0) {
+          map.fitBounds(bounds, 100);
+        }
+      });
+
+      return `Travel plan for ${args.days} days in ${args.destination} has been generated and displayed in the travel panel.`;
+    } catch (error) {
+      console.error("Travel Plan Error:", error);
+      return `Error generating travel plan: ${error.message}`;
     }
   } else if (functionName === "closeWeatherInfo") {
     const panel = document.getElementById("weather-panel");

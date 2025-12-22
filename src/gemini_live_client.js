@@ -2,6 +2,7 @@ import { executeMapCommand } from "./tool_executor.js";
 import { mapNavigationTools } from "./map_navigation_tools.js";
 import { placesTools } from "./places_tools.js";
 import { weatherTools } from "./weather_tools.js";
+import { travelTools } from "./travel_tools.js";
 import { addMessage } from "./chat_interface.js";
 
 export class GeminiLiveClient {
@@ -82,6 +83,7 @@ export class GeminiLiveClient {
               ...mapNavigationTools,
               ...placesTools,
               ...weatherTools,
+              ...travelTools,
             ],
           },
         ],
