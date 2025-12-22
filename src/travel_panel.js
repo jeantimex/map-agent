@@ -142,6 +142,7 @@ export function updateTravelPanel(
             <gmp-place-attribution light-scheme-color="gray" dark-scheme-color="white"></gmp-place-attribution>
           </gmp-place-content-config>
         </gmp-place-details-compact>
+        <span class="material-symbols-outlined accessory-icon">chevron_right</span>
       `;
 
       if (markerCallbacks) {

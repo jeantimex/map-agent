@@ -274,7 +274,7 @@ gmp-place-details-compact {
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 360px;
+  width: 400px;
   background-color: var(--chat-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -349,6 +349,16 @@ gmp-place-details-compact {
   cursor: pointer;
   transition: background-color 0.2s;
   flex-shrink: 0; /* Prevent shrinking */
+  display: flex; /* Support accessory icon */
+  align-items: center;
+  justify-content: space-between;
+}
+
+.accessory-icon {
+  color: var(--text-secondary);
+  padding-right: 10px;
+  pointer-events: none;
+  font-size: 20px !important;
 }
 
 .place-item:last-child {
@@ -378,7 +388,7 @@ gmp-place-details {
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 340px;
+  width: 400px;
   background-color: var(--chat-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -395,7 +405,7 @@ gmp-place-details {
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 360px;
+  width: 400px;
   background-color: var(--chat-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
