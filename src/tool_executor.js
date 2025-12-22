@@ -857,7 +857,9 @@ export async function executeMapCommand(
             map.fitBounds(bounds, 100);
           }
         },
-        weatherData
+        weatherData,
+        map,
+        markerCallbacks
       );
 
       return `Travel plan for ${args.days} days in ${args.destination} has been generated and displayed in the travel panel.`;

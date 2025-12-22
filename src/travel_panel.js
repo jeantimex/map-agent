@@ -20,7 +20,13 @@ export function createTravelPanel() {
   return panel;
 }
 
-export function updateTravelPanel(plan, onDaySelect, weatherData) {
+export function updateTravelPanel(
+  plan,
+  onDaySelect,
+  weatherData,
+  map,
+  markerCallbacks
+) {
   const panel = document.getElementById("travel-panel");
   if (!panel) return;
   panel.style.display = "flex";
@@ -118,6 +124,7 @@ export function updateTravelPanel(plan, onDaySelect, weatherData) {
     day.places.forEach((place) => {
       const item = document.createElement("div");
       item.className = "place-item";
+      item.id = `place_card${place.place_id}`;
       item.innerHTML = `
         <gmp-place-details-compact orientation="horizontal" truncation-preferred slot="control-block-start-inline-center">
           <gmp-place-details-place-request place="${place.place_id}"></gmp-place-details-place-request>
@@ -132,7 +139,29 @@ export function updateTravelPanel(plan, onDaySelect, weatherData) {
           </gmp-place-content-config>
         </gmp-place-details-compact>
       `;
+
+      if (markerCallbacks) {
+        item.addEventListener("mouseenter", () => {
+          markerCallbacks.onMouseEnter(place.place_id);
+        });
+        item.addEventListener("mouseleave", () => {
+          markerCallbacks.onMouseLeave(place.place_id);
+        });
+      }
+
       item.addEventListener("click", () => {
+        // Center and zoom map on click, but only if not already visible at sufficient zoom
+        if (map && place.geometry && place.geometry.location) {
+          const currentBounds = map.getBounds();
+          const currentZoom = map.getZoom();
+          const isInBounds =
+            currentBounds && currentBounds.contains(place.geometry.location);
+
+          if (!(isInBounds && currentZoom >= 15)) {
+            map.setCenter(place.geometry.location);
+            map.setZoom(15);
+          }
+        }
         pushView(() => renderDayDetails(day));
         renderPlaceDetails(place);
       });
