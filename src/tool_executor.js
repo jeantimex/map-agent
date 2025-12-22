@@ -258,6 +258,10 @@ export async function executeMapCommand(
       safeArgs.level !== undefined ? safeArgs.level : currentZoom - 1;
     map.setZoom(newZoom);
     return `Successfully executed zoomOutMap. New zoom level: ${newZoom}`;
+  } else if (functionName === "getMapZoom") {
+    if (!map) return "Error: Map not initialized.";
+    const zoom = map.getZoom();
+    return `Current map zoom level is ${zoom}.`;
   } else if (functionName === "showTraffic") {
     if (!map) return "Error: Map not initialized.";
     if (!trafficLayer) {

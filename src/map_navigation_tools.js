@@ -223,6 +223,14 @@ export const mapNavigationTools = [
     },
   },
   {
+    name: "getMapZoom",
+    description: "Returns the current zoom level of the map.",
+    parameters: {
+      type: "OBJECT",
+      properties: {},
+    },
+  },
+  {
     name: "showTraffic",
     description:
       "Shows real-time traffic information on the map by adding a traffic layer. This tool does NOT create markers or pins, it only changes the view.",
