@@ -135,7 +135,7 @@ export function updateTravelPanel(
       const card = document.createElement("div");
       card.className = "travel-day-card";
       card.style.cssText =
-        "padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s;";
+        "padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: space-between;";
 
       let weatherHtml = "";
       if (
@@ -157,11 +157,44 @@ export function updateTravelPanel(
         `;
       }
 
+      let photosHtml = "";
+      const dayPhotos = [];
+      day.places.forEach((place) => {
+        if (place.photos && place.photos.length > 0) {
+          try {
+            dayPhotos.push(
+              place.photos[0].getURI({ maxWidth: 80, maxHeight: 60 })
+            );
+          } catch (e) {
+            console.warn("Could not get photo URI", e);
+          }
+        }
+      });
+
+      if (dayPhotos.length > 0) {
+        photosHtml = `
+          <div style="display:flex; gap:6px; overflow-x:auto; margin-top:10px; padding-bottom:5px; scrollbar-width: none;">
+              ${dayPhotos
+                .slice(0, 5)
+                .map(
+                  (uri) => `
+                  <img src="${uri}" style="width:80px; height:60px; object-fit:cover; border-radius:4px; flex-shrink:0; background-color: #eee;">
+              `
+                )
+                .join("")}
+          </div>
+        `;
+      }
+
       card.innerHTML = `
-        <h3 style="margin: 0 0 5px; font-size: 16px;">Day ${day.day}: ${day.theme || "Explore"}</h3>
-        <p style="margin: 0; color: #666; font-size: 13px;">${day.places.length} places</p>
-        <p style="margin: 5px 0 0; font-size: 12px; color: #888;">${day.summary || ""}</p>
-        ${weatherHtml}
+        <div style="flex: 1; overflow: hidden;">
+          <h3 style="margin: 0 0 5px; font-size: 16px;">Day ${day.day}: ${day.theme || "Explore"}</h3>
+          <p style="margin: 0; color: #666; font-size: 13px;">${day.places.length} places</p>
+          <p style="margin: 5px 0 0; font-size: 12px; color: #888;">${day.summary || ""}</p>
+          ${weatherHtml}
+          ${photosHtml}
+        </div>
+        <span class="material-symbols-outlined accessory-icon" style="padding-left: 10px;">chevron_right</span>
       `;
 
       card.onmouseover = () => (card.style.backgroundColor = "#f9f9f9");

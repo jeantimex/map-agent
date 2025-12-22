@@ -40,7 +40,7 @@ A sophisticated system for generating and managing trip itineraries:
 - Day-by-Day Exploration: Navigate through a nested UI stack to see specific activities for each day.
 - Integrated Experience: Automatically centers the map on the destination and displays relevant weather information if travel dates are provided.
 
-![Travel Itinerary](https://github.com/user-attachments/assets/cf55969e-f095-4e6f-9cb3-8efee8e56d67)
+![Travel Itinerary](https://github.com/user-attachments/assets/1a422723-65b1-4466-b960-15273d96997e)
 
 ### Weather Information Tools
 
