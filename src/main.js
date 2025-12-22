@@ -67,6 +67,11 @@ async function handleSendMessage(message) {
 
 // --- Initialization ---
 async function initializeApp() {
+  console.log("Environment check:", {
+    hasMapsKey: !!import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    hasGeminiKey: !!import.meta.env.VITE_GEMINI_API_KEY,
+  });
+
   // Initialize Map
   const services = await initMapService();
   if (services) {

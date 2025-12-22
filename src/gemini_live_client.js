@@ -20,6 +20,15 @@ export class GeminiLiveClient {
 
   async connect() {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+    if (!apiKey) {
+      const msg =
+        "Gemini API Key is missing. Please ensure VITE_GEMINI_API_KEY is set in your environment during build.";
+      console.error(msg);
+      addMessage(msg, false);
+      return;
+    }
+
     const host = "generativelanguage.googleapis.com";
     const url = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`;
 
@@ -189,6 +198,11 @@ export class GeminiLiveClient {
         sampleRate: 16000,
       },
     });
+
+    if (!this.audioContext) {
+      this.mediaStream.getTracks().forEach((track) => track.stop());
+      return;
+    }
 
     const source = this.audioContext.createMediaStreamSource(this.mediaStream);
 
