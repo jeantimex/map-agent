@@ -1,5 +1,5 @@
 import { updatePlacesPanel, showPlaceDetails } from "./side_panel.js";
-import { updateWeatherPanel } from "./weather_panel.js";
+import { updateWeatherPanel, updateForecastPanel } from "./weather_panel.js";
 
 /**
  * Helper to update panorama position if it's currently visible/linked.
@@ -706,7 +706,11 @@ export async function executeMapCommand(
       return "Error: Please provide a location name or coordinates.";
     }
 
-    const url = `https://weather.googleapis.com/v1/currentConditions:lookup?key=${apiKey}&location.latitude=${lat}&location.longitude=${lng}`;
+    if (map) {
+      map.panTo({ lat, lng });
+    }
+
+    const url = `/weather-api/v1/currentConditions:lookup?key=${apiKey}&location.latitude=${lat}&location.longitude=${lng}`;
     
     console.log("Fetching weather from:", url);
 
@@ -732,6 +736,66 @@ export async function executeMapCommand(
       console.error("Weather Fetch Exception:", e);
       return `Error fetching weather: ${e.message}`;
     }
+  } else if (functionName === "getDailyForecast") {
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    let lat = args.lat;
+    let lng = args.lng;
+
+    if (args.location && (lat === undefined || lng === undefined)) {
+      if (!geocoder) return "Error: Geocoder not initialized.";
+      try {
+        const { results } = await geocoder.geocode({ address: args.location });
+        if (results && results[0]) {
+          const loc = results[0].geometry.location;
+          lat = loc.lat();
+          lng = loc.lng();
+        } else {
+          return `Error: Could not find location '${args.location}'.`;
+        }
+      } catch (e) {
+        return `Error geocoding location '${args.location}': ${e.message}`;
+      }
+    }
+
+    if (lat === undefined || lng === undefined) {
+      return "Error: Please provide a location name or coordinates.";
+    }
+
+    if (map) {
+      map.panTo({ lat, lng });
+    }
+
+    const url = `/weather-api/v1/forecast/days:lookup?key=${apiKey}&location.latitude=${lat}&location.longitude=${lng}`;
+
+    console.log("Fetching forecast from:", url);
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        let errorMessage = `Error fetching forecast: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.error && errorData.error.message) {
+            errorMessage = errorData.error.message;
+          }
+        } catch (e) {}
+        console.error("Weather API Error:", response.status, errorMessage);
+        return errorMessage;
+      }
+      const data = await response.json();
+      updateForecastPanel(data);
+      return `7-day forecast displayed for ${args.location || lat + "," + lng}.`;
+    } catch (e) {
+      console.error("Weather Fetch Exception:", e);
+      return `Error fetching forecast: ${e.message}`;
+    }
+  } else if (functionName === "closeWeatherInfo") {
+    const panel = document.getElementById("weather-panel");
+    if (panel) {
+      panel.style.display = "none";
+      return "Weather panel closed.";
+    }
+    return "Weather panel is not open.";
   } else if (functionName === "clearMarkers") {
     clearPlacesMarkers();
     if (directionsRenderer) {

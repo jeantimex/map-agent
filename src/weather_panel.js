@@ -159,3 +159,72 @@ export function updateWeatherPanel(data) {
          .style("fill", "#666");
   }
 }
+
+export function updateForecastPanel(data) {
+  const panel = document.getElementById("weather-panel");
+  if (!panel) return;
+
+  panel.style.display = "flex";
+  const content = document.getElementById("weather-content");
+  const chartContainer = document.getElementById("weather-chart");
+  const title = document.getElementById("weather-panel-title");
+
+  title.textContent = "Daily Forecast";
+  content.innerHTML = "";
+  chartContainer.innerHTML = "";
+
+  if (!data || !data.forecastDays) return;
+
+  const list = document.createElement("div");
+  list.style.padding = "0 15px";
+
+  data.forecastDays.forEach((day) => {
+    const date = new Date(
+      day.displayDate.year,
+      day.displayDate.month - 1,
+      day.displayDate.day
+    );
+    const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+    const dateStr = date.toLocaleDateString("en-US", {
+      month: "numeric",
+      day: "numeric",
+    });
+    const min = Math.round(day.minTemperature.degrees);
+    const max = Math.round(day.maxTemperature.degrees);
+
+    // Use daytimeForecast for the general summary
+    const cond = day.daytimeForecast?.weatherCondition?.description?.text || "";
+    const icon = day.daytimeForecast?.weatherCondition?.iconBaseUri
+      ? day.daytimeForecast.weatherCondition.iconBaseUri + ".png"
+      : "";
+    const rain = day.daytimeForecast?.precipitation?.probability?.percent || 0;
+    const humidity = day.daytimeForecast?.relativeHumidity || 0;
+
+    const item = document.createElement("div");
+    item.style.cssText =
+      "display: grid; grid-template-columns: 50px 1fr 80px 60px; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f3f4; font-size: 13px;";
+    item.innerHTML = `
+        <div style="display:flex; flex-direction:column; line-height:1.2;">
+            <span style="font-weight: 500;">${dayName}</span>
+            <span style="color: var(--text-secondary); font-size: 11px;">${dateStr}</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+           <img src="${icon}" style="width: 28px; height: 28px;" onerror="this.style.display='none'">
+           <div style="display:flex; flex-direction:column; line-height:1.2;">
+               <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;">${cond}</span>
+           </div>
+        </div>
+        <div style="display:flex; flex-direction:column; color: var(--text-secondary); font-size: 11px; line-height:1.3;">
+            <span>💧 ${rain}%</span>
+            <span>HUM: ${humidity}%</span>
+        </div>
+        <div style="text-align: right;">
+           <span style="color: var(--text-secondary); margin-right: 4px;">${min}°</span>
+           <span style="font-weight: 500;">${max}°</span>
+        </div>
+      `;
+    list.appendChild(item);
+  });
+
+  content.appendChild(list);
+}
