@@ -17,6 +17,8 @@ These tools allow for precise control over the map viewport and environment laye
 - Environmental Layers: Toggle real-time traffic information and public transit network overlays.
 - Map Types: Switch between roadmap, satellite, hybrid, and terrain views.
 
+![Map Navigation](https://github.com/user-attachments/assets/3ea8fa58-54da-49d5-a93a-325debacf2c3)
+
 ### Places Exploration Tools
 
 Integrated with the New Places API to provide rich location data:
