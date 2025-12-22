@@ -28,6 +28,10 @@ Integrated with the New Places API to provide rich location data:
 - Place Details: Retrieve comprehensive information including ratings, photos, opening hours, and contact details.
 - Interactive Markers: Results are displayed as advanced markers on the map, featuring synchronized highlighting between the map and the side panel.
 
+![Places Exploration](https://github.com/user-attachments/assets/0164fcde-82e6-4aff-8565-4c32ad489b90)
+
+![Place Details](https://github.com/user-attachments/assets/d3ab484c-02f6-498a-881b-4536c4927520)
+
 ### Travel Planning Tools
 
 A sophisticated system for generating and managing trip itineraries:
