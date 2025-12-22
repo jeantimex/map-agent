@@ -372,3 +372,20 @@ gmp-place-details-compact,
 gmp-place-details {
   border: none;
 }
+
+/* Weather Panel */
+#weather-panel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 340px;
+  background-color: var(--chat-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 501; /* Higher than places panel */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Google Sans', sans-serif;
+}

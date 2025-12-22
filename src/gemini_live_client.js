@@ -1,6 +1,7 @@
 import { executeMapCommand } from "./tool_executor.js";
 import { mapNavigationTools } from "./map_navigation_tools.js";
 import { placesTools } from "./places_tools.js";
+import { weatherTools } from "./weather_tools.js";
 import { addMessage } from "./chat_interface.js";
 
 export class GeminiLiveClient {
@@ -68,7 +69,11 @@ export class GeminiLiveClient {
         model: "models/gemini-2.5-flash-native-audio-preview-12-2025",
         tools: [
           {
-            functionDeclarations: [...mapNavigationTools, ...placesTools],
+            functionDeclarations: [
+              ...mapNavigationTools,
+              ...placesTools,
+              ...weatherTools,
+            ],
           },
         ],
         generationConfig: {
