@@ -284,6 +284,15 @@ export async function executeMapCommand(
 
     document.getElementById("map-container").classList.add("split-view");
 
+    // Collapse all panels when entering Street View
+    const panels = ["places-panel", "weather-panel", "travel-panel"];
+    panels.forEach((id) => {
+      const panel = document.getElementById(id);
+      if (panel && panel.collapse) {
+        panel.collapse();
+      }
+    });
+
     panorama.setPosition(map.getCenter());
     panorama.setPov({
       heading: map.getHeading() || 0,

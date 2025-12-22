@@ -10,16 +10,50 @@ export function createTravelPanel() {
         </button>
         <span id="travel-panel-title">Trip Plan</span>
       </div>
-      <button id="close-travel-panel" style="background:none; border:none; cursor:pointer; font-size:18px; padding:0; display:flex; align-items:center;">
-        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
-      </button>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button id="toggle-travel-panel" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center;">
+          <span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>
+        </button>
+        <button id="close-travel-panel" style="background:none; border:none; cursor:pointer; font-size:18px; padding:0; display:flex; align-items:center;">
+          <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+        </button>
+      </div>
     </div>
     <div id="travel-content" style="flex:1; overflow-y:auto;"></div>
   `;
 
+  const content = panel.querySelector("#travel-content");
+  const toggleBtn = panel.querySelector("#toggle-travel-panel");
+
+  toggleBtn.addEventListener("click", () => {
+    if (content.style.display === "none") {
+      content.style.display = "block";
+      toggleBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>';
+    } else {
+      content.style.display = "none";
+      toggleBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
+    }
+  });
+
   panel.querySelector("#close-travel-panel").addEventListener("click", () => {
     panel.style.display = "none";
   });
+
+  panel.collapse = () => {
+    if (content.style.display !== "none") {
+      content.style.display = "none";
+      toggleBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
+    }
+  };
+
+  panel.expand = () => {
+    content.style.display = "block";
+    toggleBtn.innerHTML =
+      '<span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>';
+  };
 
   return panel;
 }
@@ -34,10 +68,12 @@ export function updateTravelPanel(
   const panel = document.getElementById("travel-panel");
   if (!panel) return;
   panel.style.display = "flex";
+  if (panel.expand) panel.expand();
 
   const content = document.getElementById("travel-content");
   const backBtn = document.getElementById("travel-back-btn");
   const title = document.getElementById("travel-panel-title");
+  // ... rest of the function ...
 
   const stack = [];
 

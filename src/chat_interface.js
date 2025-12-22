@@ -125,19 +125,40 @@ export function initChatInterface(onSendMessage) {
   });
 }
 
-export function addMessage(text, isUser = false) {
-  if (!text || !text.trim()) return;
-  const messagesContainer = document.getElementById("chat-messages");
+export function addMessage(text, isUser = true) {
+  const chatMessages = document.getElementById("chat-messages");
   const messageDiv = document.createElement("div");
   messageDiv.className = `message ${isUser ? "user" : "system"}`;
 
-  if (isUser) {
-    messageDiv.textContent = text;
-  } else {
-    // Parse Markdown for system messages
+  if (!isUser) {
     messageDiv.innerHTML = marked.parse(text);
+  } else {
+    messageDiv.textContent = text;
   }
 
-  messagesContainer.appendChild(messageDiv);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  chatMessages.appendChild(messageDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+export function addLoadingMessage() {
+  const chatMessages = document.getElementById("chat-messages");
+  const messageDiv = document.createElement("div");
+  messageDiv.className = "message system loading-message";
+  messageDiv.id = "chat-loading-indicator";
+  messageDiv.innerHTML = `
+    <div class="typing-indicator">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  `;
+  chatMessages.appendChild(messageDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+export function removeLoadingMessage() {
+  const indicator = document.getElementById("chat-loading-indicator");
+  if (indicator) {
+    indicator.remove();
+  }
 }

@@ -6,18 +6,56 @@ export function createWeatherPanel() {
   panel.style.display = "none";
   panel.innerHTML = `
     <div class="panel-header">
-      <span id="weather-panel-title">Weather</span>
-      <button id="close-weather-panel" style="background:none; border:none; cursor:pointer; font-size:18px; display:flex; align-items:center; padding:0;">
-        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
-      </button>
+      <div style="display:flex; align-items:center;">
+        <span id="weather-panel-title">Weather</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button id="toggle-weather-panel" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center;">
+          <span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>
+        </button>
+        <button id="close-weather-panel" style="background:none; border:none; cursor:pointer; font-size:18px; display:flex; align-items:center; padding:0;">
+          <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+        </button>
+      </div>
     </div>
-    <div id="weather-content"></div>
-    <div id="weather-chart" style="padding: 10px;"></div>
+    <div id="weather-content-container">
+      <div id="weather-content"></div>
+      <div id="weather-chart" style="padding: 10px;"></div>
+    </div>
   `;
+
+  const container = panel.querySelector("#weather-content-container");
+  const toggleBtn = panel.querySelector("#toggle-weather-panel");
+
+  toggleBtn.addEventListener("click", () => {
+    if (container.style.display === "none") {
+      container.style.display = "block";
+      toggleBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>';
+    } else {
+      container.style.display = "none";
+      toggleBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
+    }
+  });
 
   panel.querySelector("#close-weather-panel").addEventListener("click", () => {
     panel.style.display = "none";
   });
+
+  panel.collapse = () => {
+    if (container.style.display !== "none") {
+      container.style.display = "none";
+      toggleBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
+    }
+  };
+
+  panel.expand = () => {
+    container.style.display = "block";
+    toggleBtn.innerHTML =
+      '<span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>';
+  };
 
   return panel;
 }
@@ -27,6 +65,8 @@ export function updateWeatherPanel(data) {
   if (!panel) return;
 
   panel.style.display = "flex";
+  if (panel.expand) panel.expand();
+
   const content = document.getElementById("weather-content");
   const chartContainer = document.getElementById("weather-chart");
   const title = document.getElementById("weather-panel-title");
@@ -36,6 +76,9 @@ export function updateWeatherPanel(data) {
   chartContainer.innerHTML = "";
 
   if (!data) return;
+
+  title.textContent = "Weather";
+  // ... rest of the code ...
 
   // Helper to format values
   const temp = data.temperature.degrees;
@@ -167,6 +210,8 @@ export function updateForecastPanel(data) {
   if (!panel) return;
 
   panel.style.display = "flex";
+  if (panel.expand) panel.expand();
+
   const content = document.getElementById("weather-content");
   const chartContainer = document.getElementById("weather-chart");
   const title = document.getElementById("weather-panel-title");

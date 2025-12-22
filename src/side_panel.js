@@ -36,11 +36,13 @@ export function createSidePanel() {
     // If the active view is currently hidden, show it (Expand)
     if (activeView.style.display === "none") {
       activeView.style.display = activeView === list ? "flex" : "block";
-      toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
+      toggleBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>';
     } else {
       // Otherwise, hide it (Collapse)
       activeView.style.display = "none";
-      toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>';
+      toggleBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
     }
   });
 
@@ -51,7 +53,8 @@ export function createSidePanel() {
     backBtn.style.display = "none";
     title.textContent = "Places Found";
     count.style.display = "inline-block";
-    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
+    toggleBtn.innerHTML =
+      '<span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>';
 
     // Update state
     activeView = list;
@@ -89,6 +92,14 @@ export function createSidePanel() {
     }
   };
 
+  panel.collapse = () => {
+    if (activeView.style.display !== "none") {
+      activeView.style.display = "none";
+      toggleBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
+    }
+  };
+
   return panel;
 }
 
@@ -99,6 +110,7 @@ export function showPlaceDetails(place) {
   const backBtn = document.getElementById("back-to-list");
   const title = document.getElementById("panel-title");
   const countBadge = document.getElementById("places-count");
+  const toggleBtn = document.getElementById("toggle-panel");
 
   // Ensure panel is visible
   if (panel) panel.style.display = "flex";
@@ -108,6 +120,11 @@ export function showPlaceDetails(place) {
   if (backBtn) backBtn.style.display = "flex";
   if (title) title.textContent = place.name;
   if (countBadge) countBadge.style.display = "none";
+
+  if (toggleBtn) {
+    toggleBtn.innerHTML =
+      '<span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>';
+  }
 
   // Update active view state (hacky access to panel property we set in createSidePanel)
   if (panel && panel.setActiveView) panel.setActiveView("details");
@@ -164,7 +181,10 @@ export function updatePlacesPanel(places, map, callbacks = {}) {
   if (places && places.length > 0) {
     panel.style.display = "flex";
     list.style.display = "flex";
-    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
+    if (toggleBtn) {
+      toggleBtn.innerHTML =
+        '<span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>';
+    }
     list.innerHTML = "";
 
     // Update count

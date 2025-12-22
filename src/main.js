@@ -1,6 +1,11 @@
 import { initMapService } from "./map_service.js";
 import { initGemini, getChatSession } from "./gemini_service.js";
-import { initChatInterface, addMessage } from "./chat_interface.js";
+import {
+  initChatInterface,
+  addMessage,
+  addLoadingMessage,
+  removeLoadingMessage,
+} from "./chat_interface.js";
 import { executeMapCommand } from "./tool_executor.js";
 import { createLiveControl } from "./live_control.js";
 import { GeminiLiveClient } from "./gemini_live_client.js";
@@ -25,6 +30,7 @@ let liveControl = null;
 // --- Core Logic ---
 async function handleSendMessage(message) {
   const chatSession = getChatSession();
+  addLoadingMessage();
 
   try {
     const result = await chatSession.sendMessage(message);
@@ -55,14 +61,17 @@ async function handleSendMessage(message) {
         ];
 
         const finalResult = await chatSession.sendMessage(resultParts);
-        addMessage(finalResult.response.text());
+        removeLoadingMessage();
+        addMessage(finalResult.response.text(), false);
       }
     } else {
-      addMessage(response.text());
+      removeLoadingMessage();
+      addMessage(response.text(), false);
     }
   } catch (error) {
     console.error("Gemini Error:", error);
-    addMessage("Sorry, I encountered an error processing your request.");
+    removeLoadingMessage();
+    addMessage("Sorry, I encountered an error processing your request.", false);
   }
 }
 
@@ -132,7 +141,8 @@ async function initializeApp() {
     document.querySelector(".app-container").appendChild(travelPanel);
 
     addMessage(
-      "Hello! I'm your AI Map Agent. I can move the map, zoom, search for places, and give directions. Try saying 'Go to Paris' or 'Find pizza nearby'."
+      "Hello! I'm your AI Map Agent. I can move the map, zoom, search for places, and give directions. Try saying 'Go to Paris' or 'Find pizza nearby'.",
+      false
     );
   }
 }
