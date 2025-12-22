@@ -35,24 +35,32 @@ export function getChatSession() {
   return chatSession;
 }
 
-export async function generateTravelItinerary(destination, days, preferences) {
+export async function generateTravelItinerary(
+  destination,
+  days,
+  preferences,
+  startDate
+) {
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({
     model: "gemini-2.0-flash-exp",
     generationConfig: { responseMimeType: "application/json" },
   });
 
-  const prompt = `Create a ${days}-day travel itinerary for ${destination}. 
+  const dateContext = startDate ? ` starting from ${startDate}` : "";
+  const prompt = `Create a ${days}-day travel itinerary for ${destination}${dateContext}. 
   Preferences: ${preferences || "General"}.
   
   Return a JSON object with this structure:
   {
     "destination": "${destination}",
     "days": ${days},
+    "startDate": "${startDate || ""}",
     "preferences": "${preferences || ""}",
     "itinerary": [
       {
         "day": 1,
+        "date": "YYYY-MM-DD",
         "theme": "Theme of the day",
         "summary": "Short summary",
         "places": ["Place Name 1", "Place Name 2"] 

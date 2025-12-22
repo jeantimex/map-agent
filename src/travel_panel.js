@@ -20,7 +20,7 @@ export function createTravelPanel() {
   return panel;
 }
 
-export function updateTravelPanel(plan, onDaySelect) {
+export function updateTravelPanel(plan, onDaySelect, weatherData) {
   const panel = document.getElementById("travel-panel");
   if (!panel) return;
   panel.style.display = "flex";
@@ -67,10 +67,32 @@ export function updateTravelPanel(plan, onDaySelect) {
       card.className = "travel-day-card";
       card.style.cssText =
         "padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s;";
+
+      let weatherHtml = "";
+      if (
+        weatherData &&
+        weatherData.forecastDays &&
+        weatherData.forecastDays[index]
+      ) {
+        const w = weatherData.forecastDays[index];
+        const icon = w.daytimeForecast?.weatherCondition?.iconBaseUri
+          ? w.daytimeForecast.weatherCondition.iconBaseUri + ".png"
+          : "";
+        const min = Math.round(w.minTemperature.degrees);
+        const max = Math.round(w.maxTemperature.degrees);
+        weatherHtml = `
+            <div style="display:flex; align-items:center; font-size:12px; color:#666; margin-top:8px;">
+                <img src="${icon}" style="width:20px; height:20px; margin-right:5px;" onerror="this.style.display='none'">
+                <span>${min}° - ${max}°</span>
+            </div>
+        `;
+      }
+
       card.innerHTML = `
         <h3 style="margin: 0 0 5px; font-size: 16px;">Day ${day.day}: ${day.theme || "Explore"}</h3>
         <p style="margin: 0; color: #666; font-size: 13px;">${day.places.length} places</p>
         <p style="margin: 5px 0 0; font-size: 12px; color: #888;">${day.summary || ""}</p>
+        ${weatherHtml}
       `;
 
       card.onmouseover = () => (card.style.backgroundColor = "#f9f9f9");

@@ -784,8 +784,32 @@ export async function executeMapCommand(
       const plan = await generateTravelItinerary(
         args.destination,
         args.days,
-        args.preferences
+        args.preferences,
+        args.startDate
       );
+
+      // Fetch weather for destination ONLY if startDate is provided
+      let weatherData = null;
+      if (args.startDate) {
+        try {
+          const { results } = await geocoder.geocode({
+            address: plan.destination,
+          });
+          if (results && results[0]) {
+            const loc = results[0].geometry.location;
+            const lat = loc.lat();
+            const lng = loc.lng();
+            const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+            const url = `/weather-api/v1/forecast/days:lookup?key=${apiKey}&location.latitude=${lat}&location.longitude=${lng}`;
+            const res = await fetch(url);
+            if (res.ok) {
+              weatherData = await res.json();
+            }
+          }
+        } catch (e) {
+          console.warn("Failed to fetch weather for travel plan", e);
+        }
+      }
 
       // Enrich plan with real place data
       for (const day of plan.itinerary) {
@@ -818,19 +842,23 @@ export async function executeMapCommand(
         day.places = enrichedPlaces;
       }
 
-      updateTravelPanel(plan, (selectedDay) => {
-        clearPlacesMarkers();
-        const bounds = new google.maps.LatLngBounds();
-        selectedDay.places.forEach((place) => {
-          createAndAddMarker(place, map, markerCallbacks);
-          if (place.geometry && place.geometry.location) {
-            bounds.extend(place.geometry.location);
+      updateTravelPanel(
+        plan,
+        (selectedDay) => {
+          clearPlacesMarkers();
+          const bounds = new google.maps.LatLngBounds();
+          selectedDay.places.forEach((place) => {
+            createAndAddMarker(place, map, markerCallbacks);
+            if (place.geometry && place.geometry.location) {
+              bounds.extend(place.geometry.location);
+            }
+          });
+          if (map && selectedDay.places.length > 0) {
+            map.fitBounds(bounds, 100);
           }
-        });
-        if (map && selectedDay.places.length > 0) {
-          map.fitBounds(bounds, 100);
-        }
-      });
+        },
+        weatherData
+      );
 
       return `Travel plan for ${args.days} days in ${args.destination} has been generated and displayed in the travel panel.`;
     } catch (error) {
