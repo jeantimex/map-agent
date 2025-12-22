@@ -240,4 +240,22 @@ export const mapNavigationTools = [
       properties: {},
     },
   },
+  {
+    name: "showTransit",
+    description:
+      "Shows the public transit layer on the map. This layer highlights public transit network lines and stations. This tool does NOT create markers or pins, it only changes the view.",
+    parameters: {
+      type: "OBJECT",
+      properties: {},
+    },
+  },
+  {
+    name: "hideTransit",
+    description:
+      "Hides the public transit layer from the map. This tool does NOT create markers or pins, it only changes the view.",
+    parameters: {
+      type: "OBJECT",
+      properties: {},
+    },
+  },
 ];

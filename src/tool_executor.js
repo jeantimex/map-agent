@@ -66,6 +66,8 @@ function simulateDrag(element, startX, startY, endX, endY, duration = 500) {
 let directionsRenderer = null;
 // Global traffic layer
 let trafficLayer = null;
+// Global transit layer
+let transitLayer = null;
 // Global markers array to clear previous search results
 let placesMarkers = [];
 
@@ -269,6 +271,19 @@ export async function executeMapCommand(
       trafficLayer.setMap(null);
     }
     return "Traffic layer hidden.";
+  } else if (functionName === "showTransit") {
+    if (!map) return "Error: Map not initialized.";
+    if (!transitLayer) {
+      transitLayer = new google.maps.TransitLayer();
+    }
+    transitLayer.setMap(map);
+    return "Transit layer displayed.";
+  } else if (functionName === "hideTransit") {
+    if (!map) return "Error: Map not initialized.";
+    if (transitLayer) {
+      transitLayer.setMap(null);
+    }
+    return "Transit layer hidden.";
   } else if (functionName === "showStreetView") {
     if (!panorama) return "Error: Street View not initialized.";
 
@@ -670,7 +685,10 @@ export async function executeMapCommand(
     if (trafficLayer) {
       trafficLayer.setMap(null);
     }
-    return "Successfully cleared all markers, directions, and traffic from the map.";
+    if (transitLayer) {
+      transitLayer.setMap(null);
+    }
+    return "Successfully cleared all markers, directions, traffic, and transit layers from the map.";
   }
 
   return `Error: Unknown tool command '${functionName}'.`;
