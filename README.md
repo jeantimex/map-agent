@@ -16,6 +16,9 @@ These tools allow for precise control over the map viewport and environment laye
 - Street View: Enable a split-screen panorama view. Navigate through Street View nodes or rotate the camera using natural language.
 - Environmental Layers: Toggle real-time traffic information and public transit network overlays.
 - Map Types: Switch between roadmap, satellite, hybrid, and terrain views.
+- Directions: Get turn-by-turn directions and route information.
+
+![Directions Demo](https://github.com/user-attachments/assets/7c2649e5-c170-47c4-a6cb-16d4eccf46b4)
 
 ![Map Navigation](https://github.com/user-attachments/assets/3ea8fa58-54da-49d5-a93a-325debacf2c3)
 

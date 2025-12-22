@@ -1,6 +1,7 @@
 import { updatePlacesPanel, showPlaceDetails } from "./side_panel.js";
 import { updateWeatherPanel, updateForecastPanel } from "./weather_panel.js";
 import { updateTravelPanel } from "./travel_panel.js";
+import { updateDirectionsPanel } from "./directions_panel.js";
 import { adaptPlaceResult } from "./places_utils.js";
 import { generateTravelItinerary } from "./gemini_service.js";
 
@@ -82,7 +83,12 @@ function clearPlacesMarkers() {
 }
 
 function closeAllPanels() {
-  const panels = ["places-panel", "weather-panel", "travel-panel"];
+  const panels = [
+    "places-panel",
+    "weather-panel",
+    "travel-panel",
+    "directions-panel",
+  ];
   panels.forEach((id) => {
     const panel = document.getElementById(id);
     if (panel) panel.style.display = "none";
@@ -685,6 +691,8 @@ export async function executeMapCommand(
             if (directionsRenderer) {
               directionsRenderer.setDirections(response);
             }
+            closeAllPanels();
+            updateDirectionsPanel(response);
             const route = response.routes[0];
             const leg = route.legs[0];
             resolve(

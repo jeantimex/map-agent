@@ -476,3 +476,21 @@ gmp-place-details {
     transform: scale(1);
   }
 }
+
+/* Directions Panel */
+#directions-panel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 340px;
+  background-color: var(--chat-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 503; /* Higher than travel panel */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: "Google Sans", sans-serif;
+  max-height: calc(100vh - 40px);
+}

@@ -12,6 +12,7 @@ import { GeminiLiveClient } from "./gemini_live_client.js";
 import { createSidePanel } from "./side_panel.js";
 import { createWeatherPanel } from "./weather_panel.js";
 import { createTravelPanel } from "./travel_panel.js";
+import { createDirectionsPanel } from "./directions_panel.js";
 import "./style.css";
 
 // Global state
@@ -139,6 +140,10 @@ async function initializeApp() {
     // Create Travel Panel
     const travelPanel = createTravelPanel();
     document.querySelector(".app-container").appendChild(travelPanel);
+
+    // Create Directions Panel
+    const directionsPanel = createDirectionsPanel();
+    document.querySelector(".app-container").appendChild(directionsPanel);
 
     addMessage(
       "Hello! I'm your AI Map Agent. I can move the map, zoom, search for places, and give directions. Try saying 'Go to Paris' or 'Find pizza nearby'.",
