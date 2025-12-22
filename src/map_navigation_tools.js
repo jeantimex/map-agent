@@ -222,4 +222,22 @@ export const mapNavigationTools = [
       required: [], // Optional
     },
   },
+  {
+    name: "showTraffic",
+    description:
+      "Shows real-time traffic information on the map by adding a traffic layer. This tool does NOT create markers or pins, it only changes the view.",
+    parameters: {
+      type: "OBJECT",
+      properties: {},
+    },
+  },
+  {
+    name: "hideTraffic",
+    description:
+      "Hides real-time traffic information from the map. This tool does NOT create markers or pins, it only changes the view.",
+    parameters: {
+      type: "OBJECT",
+      properties: {},
+    },
+  },
 ];
