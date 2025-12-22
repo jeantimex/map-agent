@@ -29,7 +29,7 @@ These tools allow for precise control over the map viewport and environment laye
 - Map Types: Switch between roadmap, satellite, hybrid, and terrain views.
 - Directions: Get turn-by-turn directions and route information.
 
-![Directions Demo](https://github.com/user-attachments/assets/7c2649e5-c170-47c4-a6cb-16d4eccf46b4)
+![Directions Demo](https://github.com/user-attachments/assets/108ae383-a2c0-4cf2-85be-48b5bbe33b12)
 
 ![Map Navigation](https://github.com/user-attachments/assets/3ea8fa58-54da-49d5-a93a-325debacf2c3)
 
