@@ -11,7 +11,7 @@ let chatSession;
 export function initGemini() {
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash-exp",
+    model: "gemini-3-flash-preview",
     tools: [
       {
         functionDeclarations: [
@@ -43,7 +43,7 @@ export async function generateTravelItinerary(
 ) {
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash-exp",
+    model: "gemini-3-flash-preview",
     generationConfig: { responseMimeType: "application/json" },
   });
 

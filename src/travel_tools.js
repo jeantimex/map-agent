@@ -28,4 +28,19 @@ export const travelTools = [
       required: ["destination", "days"],
     },
   },
+  {
+    name: "showTravelDay",
+    description:
+      "Displays the itinerary for a specific day of the currently active travel plan.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        dayNumber: {
+          type: "NUMBER",
+          description: "The day number to show (e.g., 3 for Day 3).",
+        },
+      },
+      required: ["dayNumber"],
+    },
+  },
 ];

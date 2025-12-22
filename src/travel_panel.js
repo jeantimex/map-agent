@@ -76,6 +76,28 @@ export function updateTravelPanel(
   // ... rest of the function ...
 
   const stack = [];
+  let currentDay = null;
+
+  panel.showPlaceDetailsById = (placeId) => {
+    if (!currentDay) return false;
+    const place = currentDay.places.find((p) => p.place_id === placeId);
+    if (place) {
+      pushView(() => renderDayDetails(currentDay));
+      renderPlaceDetails(place);
+      return true;
+    }
+    return false;
+  };
+
+  panel.showDay = (dayNumber) => {
+    const day = plan.itinerary.find((d) => d.day === dayNumber);
+    if (day) {
+      pushView(renderDaysList);
+      renderDayDetails(day);
+      return true;
+    }
+    return false;
+  };
 
   function pushView(renderFn) {
     stack.push(renderFn);
@@ -100,6 +122,7 @@ export function updateTravelPanel(
   }
 
   function renderDaysList() {
+    currentDay = null;
     content.innerHTML = "";
     title.textContent = `Trip to ${plan.destination}`;
 
@@ -153,6 +176,7 @@ export function updateTravelPanel(
   }
 
   function renderDayDetails(day) {
+    currentDay = day;
     content.innerHTML = "";
     title.textContent = `Day ${day.day}`;
 

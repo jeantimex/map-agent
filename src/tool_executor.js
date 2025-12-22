@@ -81,6 +81,14 @@ function clearPlacesMarkers() {
   updatePlacesPanel([]);
 }
 
+function closeAllPanels() {
+  const panels = ["places-panel", "weather-panel", "travel-panel"];
+  panels.forEach((id) => {
+    const panel = document.getElementById(id);
+    if (panel) panel.style.display = "none";
+  });
+}
+
 const markerCallbacks = {
   onMouseEnter: (placeId) => {
     const marker = placesMarkers.find(
@@ -448,6 +456,7 @@ export async function executeMapCommand(
         clearPlacesMarkers();
 
         // Update Side Panel
+        closeAllPanels();
         updatePlacesPanel(adaptedResults, map, markerCallbacks);
 
         // Add new markers
@@ -509,6 +518,7 @@ export async function executeMapCommand(
         const adaptedResults = places.map(adaptPlaceResult);
 
         clearPlacesMarkers();
+        closeAllPanels();
         updatePlacesPanel(adaptedResults, map, markerCallbacks);
 
         const bounds = new google.maps.LatLngBounds();
@@ -561,6 +571,23 @@ export async function executeMapCommand(
         const p = places[0];
         const place = adaptPlaceResult(p);
 
+        // Smart check for travel panel
+        const travelPanel = document.getElementById("travel-panel");
+        if (
+          travelPanel &&
+          travelPanel.style.display !== "none" &&
+          travelPanel.showPlaceDetailsById
+        ) {
+          const foundInTravel = travelPanel.showPlaceDetailsById(place.place_id);
+          if (foundInTravel) {
+            if (map && place.geometry && place.geometry.location) {
+              map.setCenter(place.geometry.location);
+              map.setZoom(15);
+            }
+            return JSON.stringify(place, null, 2);
+          }
+        }
+
         const existingMarker = placesMarkers.find(
           (m) => m.element.id === `place_marker${place.place_id}`
         );
@@ -570,11 +597,13 @@ export async function executeMapCommand(
             map.setCenter(place.geometry.location);
             map.setZoom(15);
           }
+          closeAllPanels();
           showPlaceDetails(place);
           return JSON.stringify(place, null, 2);
         }
 
         // Update Side Panel with this single result (so back button works)
+        closeAllPanels();
         updatePlacesPanel([place], map, markerCallbacks);
 
         // Show details immediately
@@ -729,6 +758,7 @@ export async function executeMapCommand(
         return errorMessage;
       }
       const data = await response.json();
+      closeAllPanels();
       updateWeatherPanel(data);
       return `Current weather displayed: ${data.temperature.degrees} ${data.temperature.unit}, ${data.weatherCondition.description.text}.`;
     } catch (e) {
@@ -782,6 +812,7 @@ export async function executeMapCommand(
         return errorMessage;
       }
       const data = await response.json();
+      closeAllPanels();
       updateForecastPanel(data);
       return `7-day forecast displayed for ${args.location || lat + "," + lng}.`;
     } catch (e) {
@@ -797,15 +828,20 @@ export async function executeMapCommand(
         args.startDate
       );
 
-      // Fetch weather for destination ONLY if startDate is provided
+      // Center map on destination and fetch weather if applicable
       let weatherData = null;
-      if (args.startDate) {
-        try {
-          const { results } = await geocoder.geocode({
-            address: plan.destination,
-          });
-          if (results && results[0]) {
-            const loc = results[0].geometry.location;
+      try {
+        const { results } = await geocoder.geocode({
+          address: plan.destination,
+        });
+        if (results && results[0]) {
+          const loc = results[0].geometry.location;
+          if (map) {
+            map.panTo(loc);
+            map.setZoom(12);
+          }
+
+          if (args.startDate) {
             const lat = loc.lat();
             const lng = loc.lng();
             const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -815,9 +851,9 @@ export async function executeMapCommand(
               weatherData = await res.json();
             }
           }
-        } catch (e) {
-          console.warn("Failed to fetch weather for travel plan", e);
         }
+      } catch (e) {
+        console.warn("Failed to geocode destination", e);
       }
 
       // Enrich plan with real place data
@@ -851,6 +887,7 @@ export async function executeMapCommand(
         day.places = enrichedPlaces;
       }
 
+      closeAllPanels();
       updateTravelPanel(
         plan,
         (selectedDay) => {
@@ -876,6 +913,21 @@ export async function executeMapCommand(
       console.error("Travel Plan Error:", error);
       return `Error generating travel plan: ${error.message}`;
     }
+  } else if (functionName === "showTravelDay") {
+    const travelPanel = document.getElementById("travel-panel");
+    if (
+      travelPanel &&
+      travelPanel.style.display !== "none" &&
+      travelPanel.showDay
+    ) {
+      const success = travelPanel.showDay(args.dayNumber);
+      if (success) {
+        return `Now showing Day ${args.dayNumber} of your travel plan.`;
+      } else {
+        return `Error: Day ${args.dayNumber} not found in the current travel plan.`;
+      }
+    }
+    return "Error: Travel plan is not currently open. Please generate a plan first.";
   } else if (functionName === "closeWeatherInfo") {
     const panel = document.getElementById("weather-panel");
     if (panel) {

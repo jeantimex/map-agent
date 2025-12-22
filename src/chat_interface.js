@@ -126,6 +126,8 @@ export function initChatInterface(onSendMessage) {
 }
 
 export function addMessage(text, isUser = true) {
+  if (!text || !text.trim()) return;
+
   const chatMessages = document.getElementById("chat-messages");
   const messageDiv = document.createElement("div");
   messageDiv.className = `message ${isUser ? "user" : "system"}`;
