@@ -5,10 +5,14 @@ export function createTravelPanel() {
   panel.innerHTML = `
     <div class="panel-header">
       <div style="display:flex; align-items:center;">
-        <button id="travel-back-btn" style="display:none; background:none; border:none; cursor:pointer; margin-right:8px; font-size:18px;">←</button>
+        <button id="travel-back-btn" style="display:none; background:none; border:none; cursor:pointer; margin-right:8px; font-size:18px; padding:0; display:flex; align-items:center;">
+          <span class="material-symbols-outlined" style="font-size: 20px;">arrow_back</span>
+        </button>
         <span id="travel-panel-title">Trip Plan</span>
       </div>
-      <button id="close-travel-panel" style="background:none; border:none; cursor:pointer; font-size:18px;">×</button>
+      <button id="close-travel-panel" style="background:none; border:none; cursor:pointer; font-size:18px; padding:0; display:flex; align-items:center;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+      </button>
     </div>
     <div id="travel-content" style="flex:1; overflow-y:auto;"></div>
   `;

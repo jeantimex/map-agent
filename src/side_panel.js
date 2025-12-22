@@ -10,7 +10,9 @@ export function createSidePanel() {
         <span id="panel-title">Places Found</span>
         <span id="places-count" style="margin-left: 8px; background-color: var(--primary-color); color: white; border-radius: 12px; padding: 2px 8px; font-size: 12px; font-weight: bold; display: none;"></span>
       </div>
-      <button id="toggle-panel">▼</button>
+      <button id="toggle-panel" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>
+      </button>
     </div>
     <div id="places-list"></div>
     <div id="place-details" style="display: none;"></div>
@@ -34,11 +36,11 @@ export function createSidePanel() {
     // If the active view is currently hidden, show it (Expand)
     if (activeView.style.display === "none") {
       activeView.style.display = activeView === list ? "flex" : "block";
-      toggleBtn.textContent = "▼";
+      toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
     } else {
       // Otherwise, hide it (Collapse)
       activeView.style.display = "none";
-      toggleBtn.textContent = "▲";
+      toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">expand_less</span>';
     }
   });
 
@@ -49,7 +51,7 @@ export function createSidePanel() {
     backBtn.style.display = "none";
     title.textContent = "Places Found";
     count.style.display = "inline-block";
-    toggleBtn.textContent = "▼";
+    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
 
     // Update state
     activeView = list;
@@ -162,7 +164,7 @@ export function updatePlacesPanel(places, map, callbacks = {}) {
   if (places && places.length > 0) {
     panel.style.display = "flex";
     list.style.display = "flex";
-    toggleBtn.textContent = "▼";
+    toggleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>';
     list.innerHTML = "";
 
     // Update count

@@ -7,7 +7,9 @@ export function createWeatherPanel() {
   panel.innerHTML = `
     <div class="panel-header">
       <span id="weather-panel-title">Weather</span>
-      <button id="close-weather-panel" style="background:none; border:none; cursor:pointer; font-size:18px;">×</button>
+      <button id="close-weather-panel" style="background:none; border:none; cursor:pointer; font-size:18px; display:flex; align-items:center; padding:0;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+      </button>
     </div>
     <div id="weather-content"></div>
     <div id="weather-chart" style="padding: 10px;"></div>

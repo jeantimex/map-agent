@@ -886,7 +886,15 @@ export async function executeMapCommand(
     if (transitLayer) {
       transitLayer.setMap(null);
     }
-    return "Successfully cleared all markers, directions, traffic, and transit layers from the map.";
+
+    // Close all panels
+    const panels = ["places-panel", "weather-panel", "travel-panel"];
+    panels.forEach((id) => {
+      const panel = document.getElementById(id);
+      if (panel) panel.style.display = "none";
+    });
+
+    return "Successfully cleared all markers, directions, traffic, transit layers, and closed all information panels.";
   }
 
   return `Error: Unknown tool command '${functionName}'.`;
