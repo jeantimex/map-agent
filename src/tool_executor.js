@@ -578,7 +578,9 @@ export async function executeMapCommand(
           travelPanel.style.display !== "none" &&
           travelPanel.showPlaceDetailsById
         ) {
-          const foundInTravel = travelPanel.showPlaceDetailsById(place.place_id);
+          const foundInTravel = travelPanel.showPlaceDetailsById(
+            place.place_id
+          );
           if (foundInTravel) {
             if (map && place.geometry && place.geometry.location) {
               map.setCenter(place.geometry.location);
@@ -739,7 +741,7 @@ export async function executeMapCommand(
     }
 
     const url = `/weather-api/v1/currentConditions:lookup?key=${apiKey}&location.latitude=${lat}&location.longitude=${lng}`;
-    
+
     console.log("Fetching weather from:", url);
 
     try {
@@ -874,9 +876,8 @@ export async function executeMapCommand(
             ],
           };
           try {
-            const { places } = await google.maps.places.Place.searchByText(
-              request
-            );
+            const { places } =
+              await google.maps.places.Place.searchByText(request);
             if (places && places.length > 0) {
               enrichedPlaces.push(adaptPlaceResult(places[0]));
             }

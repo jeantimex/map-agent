@@ -8,7 +8,8 @@ export const travelTools = [
       properties: {
         destination: {
           type: "STRING",
-          description: "The city or cities to visit (e.g., 'Paris' or 'Tokyo').",
+          description:
+            "The city or cities to visit (e.g., 'Paris' or 'Tokyo').",
         },
         days: {
           type: "NUMBER",

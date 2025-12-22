@@ -89,7 +89,7 @@ export function updateWeatherPanel(data) {
   // Let's assume we can append .png if needed, or check if it renders.
   // Actually, Google Weather icons often need size params or are just base paths.
   // Let's try appending ".png".
-  const icon = data.weatherCondition.iconBaseUri + ".png"; 
+  const icon = data.weatherCondition.iconBaseUri + ".png";
 
   // Basic Info
   content.innerHTML = `
@@ -123,85 +123,94 @@ export function updateWeatherPanel(data) {
 
   // D3 Chart for Temperature Range (Min/Max vs Current)
   if (data.currentConditionsHistory) {
-      const min = data.currentConditionsHistory.minTemperature.degrees;
-      const max = data.currentConditionsHistory.maxTemperature.degrees;
-      
-      const width = 320; // Approx panel width
-      const height = 60;
-      const margin = { left: 20, right: 20, top: 20, bottom: 20 };
-      
-      const svg = d3.select(chartContainer)
-        .append("svg")
-        .attr("width", "100%")
-        .attr("height", height)
-        .attr("viewBox", `0 0 ${width} ${height}`);
+    const min = data.currentConditionsHistory.minTemperature.degrees;
+    const max = data.currentConditionsHistory.maxTemperature.degrees;
 
-      // Scale
-      // Ensure the domain covers min, max, and current with some padding
-      const minVal = Math.min(min, temp);
-      const maxVal = Math.max(max, temp);
-      const padding = (maxVal - minVal) * 0.1 || 2; // Avoid 0 range
+    const width = 320; // Approx panel width
+    const height = 60;
+    const margin = { left: 20, right: 20, top: 20, bottom: 20 };
 
-      const x = d3.scaleLinear()
-        .domain([minVal - padding, maxVal + padding])
-        .range([margin.left, width - margin.right]);
+    const svg = d3
+      .select(chartContainer)
+      .append("svg")
+      .attr("width", "100%")
+      .attr("height", height)
+      .attr("viewBox", `0 0 ${width} ${height}`);
 
-      // Draw background track
-      svg.append("line")
-         .attr("x1", x(min))
-         .attr("x2", x(max))
-         .attr("y1", height / 2)
-         .attr("y2", height / 2)
-         .attr("stroke", "#e0e0e0")
-         .attr("stroke-width", 6)
-         .attr("stroke-linecap", "round");
+    // Scale
+    // Ensure the domain covers min, max, and current with some padding
+    const minVal = Math.min(min, temp);
+    const maxVal = Math.max(max, temp);
+    const padding = (maxVal - minVal) * 0.1 || 2; // Avoid 0 range
 
-      // Draw colored range (Min to Max)
-      // Gradient? Or just solid.
-      svg.append("line")
-         .attr("x1", x(min))
-         .attr("x2", x(max))
-         .attr("y1", height / 2)
-         .attr("y2", height / 2)
-         .attr("stroke", "url(#temp-gradient)")
-         .attr("stroke-width", 6)
-         .attr("stroke-linecap", "round");
-      
-      // Gradient definition
-      const defs = svg.append("defs");
-      const gradient = defs.append("linearGradient")
-        .attr("id", "temp-gradient");
-      
-      gradient.append("stop").attr("offset", "0%").attr("stop-color", "#4285F4"); // Blue
-      gradient.append("stop").attr("offset", "100%").attr("stop-color", "#EA4335"); // Red
+    const x = d3
+      .scaleLinear()
+      .domain([minVal - padding, maxVal + padding])
+      .range([margin.left, width - margin.right]);
 
-      // Draw current temp dot
-      svg.append("circle")
-         .attr("cx", x(temp))
-         .attr("cy", height / 2)
-         .attr("r", 8)
-         .attr("fill", "#fff")
-         .attr("stroke", "#333")
-         .attr("stroke-width", 2);
+    // Draw background track
+    svg
+      .append("line")
+      .attr("x1", x(min))
+      .attr("x2", x(max))
+      .attr("y1", height / 2)
+      .attr("y2", height / 2)
+      .attr("stroke", "#e0e0e0")
+      .attr("stroke-width", 6)
+      .attr("stroke-linecap", "round");
 
-      // Labels
-      // Min
-      svg.append("text")
-         .attr("x", x(min))
-         .attr("y", height / 2 + 20)
-         .attr("text-anchor", "middle")
-         .text(`L:${min}°`)
-         .style("font-size", "11px")
-         .style("fill", "#666");
+    // Draw colored range (Min to Max)
+    // Gradient? Or just solid.
+    svg
+      .append("line")
+      .attr("x1", x(min))
+      .attr("x2", x(max))
+      .attr("y1", height / 2)
+      .attr("y2", height / 2)
+      .attr("stroke", "url(#temp-gradient)")
+      .attr("stroke-width", 6)
+      .attr("stroke-linecap", "round");
 
-      // Max
-      svg.append("text")
-         .attr("x", x(max))
-         .attr("y", height / 2 + 20)
-         .attr("text-anchor", "middle")
-         .text(`H:${max}°`)
-         .style("font-size", "11px")
-         .style("fill", "#666");
+    // Gradient definition
+    const defs = svg.append("defs");
+    const gradient = defs.append("linearGradient").attr("id", "temp-gradient");
+
+    gradient.append("stop").attr("offset", "0%").attr("stop-color", "#4285F4"); // Blue
+    gradient
+      .append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", "#EA4335"); // Red
+
+    // Draw current temp dot
+    svg
+      .append("circle")
+      .attr("cx", x(temp))
+      .attr("cy", height / 2)
+      .attr("r", 8)
+      .attr("fill", "#fff")
+      .attr("stroke", "#333")
+      .attr("stroke-width", 2);
+
+    // Labels
+    // Min
+    svg
+      .append("text")
+      .attr("x", x(min))
+      .attr("y", height / 2 + 20)
+      .attr("text-anchor", "middle")
+      .text(`L:${min}°`)
+      .style("font-size", "11px")
+      .style("fill", "#666");
+
+    // Max
+    svg
+      .append("text")
+      .attr("x", x(max))
+      .attr("y", height / 2 + 20)
+      .attr("text-anchor", "middle")
+      .text(`H:${max}°`)
+      .style("font-size", "11px")
+      .style("fill", "#666");
   }
 }
 
