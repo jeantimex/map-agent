@@ -15,6 +15,16 @@ The primary mission of the Google Maps AI Agent is to advance digital accessibil
 - **Cognitive Simplification**: The agent handles complex multi-step tasks—such as planning an itinerary or finding specific types of places nearby—reducing the cognitive load required to navigate through multiple menus or settings.
 - **Unified Information Access**: By centralizing search, transit, weather, and travel planning into a single conversational interface, the project provides a more predictable and accessible flow for retrieving diverse data points.
 
+#### Gemini Live Integration (Real-Time Voice)
+
+Gemini Live enables low-latency, conversational voice control so users can explore maps without relying on precise pointer interactions.
+
+https://github.com/user-attachments/assets/8a0c7f36-38b2-4fc3-9b1d-2b86818ea697
+
+- **Streaming Audio**: Microphone audio is captured and streamed in real time using WebSockets and an AudioWorklet pipeline.
+- **Tool Use by Voice**: Spoken requests trigger the same function-calling tool suite as text chat (navigation, places, directions, weather, and travel planning).
+- **Reduced Interaction Cost**: Voice-first flows help users who benefit from hands-free operation or who find dense UI layouts challenging to navigate.
+
 ## Core Capabilities
 
 The application is structured around several specialized tool suites that the Gemini AI uses to fulfill user requests.
