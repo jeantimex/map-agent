@@ -13,6 +13,8 @@ export class GeminiLiveClient {
     this.audioContext = null;
     this.mediaStream = null;
     this.workletNode = null;
+    this.analyser = null;
+    this.outputAnalyser = null;
     this.isPlaying = false;
     this.audioQueue = [];
     this.nextPlayTime = 0;
@@ -38,7 +40,6 @@ export class GeminiLiveClient {
     this.ws.onopen = () => {
       console.log("Gemini Live WebSocket connected");
       this.isActive = true;
-      this.onActiveChange(true);
       this.sendInitialSetup();
       setTimeout(() => this.sendWelcomePrompt(), 100);
     };
@@ -63,6 +64,7 @@ export class GeminiLiveClient {
     };
 
     await this.startAudioInput();
+    this.onActiveChange(true);
   }
 
   disconnect() {
@@ -208,6 +210,15 @@ export class GeminiLiveClient {
 
     const source = this.audioContext.createMediaStreamSource(this.mediaStream);
 
+    // Create analyser for visualizer
+    this.analyser = this.audioContext.createAnalyser();
+    this.analyser.fftSize = 256;
+    source.connect(this.analyser);
+
+    // Create output analyser
+    this.outputAnalyser = this.audioContext.createAnalyser();
+    this.outputAnalyser.fftSize = 256;
+
     // Use AudioWorkletNode
     console.log("Loading AudioWorklet module...");
     try {
@@ -288,6 +299,11 @@ export class GeminiLiveClient {
     const source = this.audioContext.createBufferSource();
     source.buffer = audioBuffer;
     source.connect(this.audioContext.destination);
+
+    // Connect to output analyser
+    if (this.outputAnalyser) {
+      source.connect(this.outputAnalyser);
+    }
 
     const currentTime = this.audioContext.currentTime;
     const startTime = Math.max(currentTime, this.nextPlayTime);

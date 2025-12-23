@@ -20,6 +20,8 @@
     "@google/generative-ai": "^0.24.1",
     "@googlemaps/js-api-loader": "^2.0.2",
     "d3": "^7.9.0",
-    "marked": "^17.0.1"
+    "marked": "^17.0.1",
+    "simplex-noise": "^4.0.3",
+    "three": "^0.182.0"
   }
 }

@@ -13,6 +13,7 @@ import { createSidePanel } from "./side_panel.js";
 import { createWeatherPanel } from "./weather_panel.js";
 import { createTravelPanel } from "./travel_panel.js";
 import { createDirectionsPanel } from "./directions_panel.js";
+import { VoiceVisualizer } from "./voice_visualizer.js";
 import "./style.css";
 
 // Global state
@@ -27,6 +28,7 @@ let mapState = {
 // --- Live Client ---
 let liveClient = null;
 let liveControl = null;
+let voiceVisualizer = null;
 
 // --- Core Logic ---
 async function handleSendMessage(message) {
@@ -95,6 +97,12 @@ async function initializeApp() {
 
     initGemini();
 
+    // Create Visualizer container
+    const vizContainer = document.createElement("div");
+    vizContainer.id = "voice-viz-container";
+    document.querySelector(".app-container").appendChild(vizContainer);
+    voiceVisualizer = new VoiceVisualizer(vizContainer);
+
     // Initialize Live Client
 
     liveClient = new GeminiLiveClient({
@@ -103,6 +111,16 @@ async function initializeApp() {
       onActiveChange: (isActive) => {
         if (liveControl) {
           liveControl.setLiveState(isActive);
+        }
+
+        if (voiceVisualizer) {
+          voiceVisualizer.setActive(isActive);
+          if (isActive) {
+            voiceVisualizer.setAnalysers(
+              liveClient.analyser,
+              liveClient.outputAnalyser
+            );
+          }
         }
 
         if (isActive) {

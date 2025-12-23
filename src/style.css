@@ -494,3 +494,17 @@ gmp-place-details {
   font-family: "Google Sans", sans-serif;
   max-height: calc(100vh - 40px);
 }
+
+/* Voice Visualizer */
+#voice-viz-container {
+  position: absolute;
+  bottom: 20px;
+  right: 70px;
+  width: 150px;
+  height: 150px;
+  z-index: 450;
+  pointer-events: none;
+  display: none;
+  background: radial-gradient(circle, rgba(68, 204, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}

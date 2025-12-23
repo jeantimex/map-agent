@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { margin: 0; background: radial-gradient(circle, #001a33 0%, #000 100%); overflow: hidden; }
+        #instruction { 
+            position: absolute; color: #44ccff; top: 50%; width: 100%; 
+            text-align: center; font-family: sans-serif; transform: translateY(-50%);
+            letter-spacing: 2px; text-transform: uppercase; font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="instruction">Click to Activate Voice Sphere</div>
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "simplex-noise": "https://cdn.skypack.dev/simplex-noise@4.0.1"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { createNoise3D } from 'simplex-noise';
+
+        let audioContext, analyser, dataArray;
+        const noise3D = createNoise3D();
+
+        // --- Scene Setup ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+
+        camera.position.z = 4;
+
+        // --- Create the Sphere ---
+        const geometry = new THREE.IcosahedronGeometry(1.5, 50); 
+        const material = new THREE.PointsMaterial({
+            color: 0x44ccff,
+            size: 0.012,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+
+        const blob = new THREE.Points(geometry, material);
+        scene.add(blob);
+
+        const originalPositions = geometry.attributes.position.array.slice();
+
+        // --- Audio Logic ---
+        async function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const source = audioContext.createMediaStreamSource(stream);
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                source.connect(analyser);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                document.getElementById('instruction').style.display = 'none';
+            } catch (err) {
+                document.getElementById('instruction').innerText = "Mic access denied or not supported";
+            }
+        }
+
+        // --- Render Loop ---
+        function animate(time) {
+            requestAnimationFrame(animate);
+            
+            let volume = 0;
+            if (analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for(let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                volume = sum / dataArray.length / 255;
+            }
+
+            const positions = geometry.attributes.position.array;
+            const t = time * 0.0004;
+
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = originalPositions[i];
+                const y = originalPositions[i+1];
+                const z = originalPositions[i+2];
+
+                // Noise displacement
+                // Base movement of 0.15 + audio intensity up to 1.5
+                const noise = noise3D(x * 0.8 + t, y * 0.8 + t, z * 0.8 + t) * (0.15 + volume * 1.8);
+
+                positions[i] = x * (1 + noise);
+                positions[i+1] = y * (1 + noise);
+                positions[i+2] = z * (1 + noise);
+            }
+
+            geometry.attributes.position.needsUpdate = true;
+            blob.rotation.y += 0.001;
+            
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('mousedown', () => {
+            if (!audioContext) initAudio();
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
