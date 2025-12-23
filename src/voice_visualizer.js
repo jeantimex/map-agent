@@ -28,10 +28,10 @@ export class VoiceVisualizer {
     // --- Create the Sphere ---
     this.geometry = new THREE.IcosahedronGeometry(1.5, 50);
     this.material = new THREE.PointsMaterial({
-      color: 0x44ccff,
-      size: 0.015,
+      color: 0xccf2ff,
+      size: 0.01,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.9,
       blending: THREE.AdditiveBlending,
     });
 
@@ -102,10 +102,10 @@ export class VoiceVisualizer {
       const z = this.originalPositions[i + 2];
 
       // Noise displacement
-      // Lowered multipliers for a more subtle effect
+      // Extremely subtle multipliers
       const noise =
         this.noise3D(x * 0.8 + t, y * 0.8 + t, z * 0.8 + t) *
-        (0.1 + combinedVolume * 1.5);
+        (0.05 + combinedVolume * 0.8);
 
       positions[i] = x * (1 + noise);
       positions[i + 1] = y * (1 + noise);
